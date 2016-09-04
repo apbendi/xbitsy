@@ -7,7 +7,7 @@ defmodule Xbitsy.Tokenizer do
       {whitespace, remaining} = take_matching(source, &is_white?/1, "")
       do_lex(remaining, [whitespace | acc])
     else
-      {identifier, remaining} = lex_ident(source, "")
+      {identifier, remaining} = take_matching(source, &is_ident?/1, "")
       do_lex(remaining, [identifier | acc])
     end
   end
@@ -24,28 +24,6 @@ defmodule Xbitsy.Tokenizer do
   end
 
   def take_matching(<<>>, _matches?, acc) do
-    {acc, <<>>}
-  end
-
-  def lex_white(source = << first :: utf8, tail :: binary >>, acc) do
-    cond do
-      is_white?(first) -> lex_white(tail, << acc::binary, first::utf8 >>)
-      true -> {acc, source}
-    end
-  end
-
-  def lex_white(<<>>, acc) do
-    {acc, <<>>}
-  end
-
-  def lex_ident(source = << first :: utf8, tail :: binary >>, acc) do
-    cond do
-      is_ident?(first) -> lex_ident(tail, << acc::binary, first::utf8 >>)
-      true -> {acc, source}
-    end
-  end
-
-  def lex_ident(<<>>, acc) do
     {acc, <<>>}
   end
 
