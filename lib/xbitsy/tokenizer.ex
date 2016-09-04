@@ -3,13 +3,8 @@ defmodule Xbitsy.Tokenizer do
   def lex(source), do: do_lex(source, [])
 
   def do_lex(source = << first :: utf8, tail :: binary >>, acc) do
-    if first == ?\s do
-      {whitespace, remaining} = take_matching(source, &is_white?/1, "")
-      do_lex(remaining, [whitespace | acc])
-    else
-      {identifier, remaining} = take_matching(source, &is_ident?/1, "")
-      do_lex(remaining, [identifier | acc])
-    end
+    {lexeme, remaining} = take_matching(source, matcher_for(first), "")
+    do_lex(remaining, [lexeme | acc])
   end
 
   def do_lex(<<>>, acc) do
@@ -25,6 +20,14 @@ defmodule Xbitsy.Tokenizer do
 
   def take_matching(<<>>, _matches?, acc) do
     {acc, <<>>}
+  end
+
+  def matcher_for(char) do
+    cond do
+      is_white?(char) -> &is_white?/1
+      is_ident?(char) -> &is_ident?/1
+      true -> raise "Illegal character #{char}"
+    end
   end
 
   # MATCHERS
