@@ -33,4 +33,16 @@ defmodule TokenizerTest do
   test "lex a variable name" do
     assert lex("BEGIN var END") == ["BEGIN", " ", "var", " ", "END"]
   end
+
+  test "lex a number" do
+    assert lex("116") == ["116"]
+  end
+
+  test "lex two numbers" do
+    assert lex("116 827") == ["116", " ", "827"]
+  end
+
+  test "lex a number in a program" do
+    assert lex("BEGIN x 42 \tEND") == ["BEGIN", " ", "x", " ", "42", " \t", "END"]
+  end
 end
