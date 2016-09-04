@@ -29,4 +29,8 @@ defmodule TokenizerTest do
   test "lex the bitsy null program" do
     assert lex("BEGIN END") == ["BEGIN", " ", "END"]
   end
+
+  test "lex a variable name" do
+    assert lex("BEGIN var END") == ["BEGIN", " ", "var", " ", "END"]
+  end
 end

@@ -38,6 +38,6 @@ defmodule Xbitsy.Tokenizer do
     {acc, <<>>}
   end
 
-  def is_ident(char) when char >= ?A and char <= ?Z, do: true
+  def is_ident(char) when (char >= ?A and char <= ?Z) or (char >= ?a and char <= ?z), do: true
   def is_ident(_char), do: false
 end
