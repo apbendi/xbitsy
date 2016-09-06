@@ -124,4 +124,25 @@ defmodule TokenizerTest do
              ]
     assert tokenize("= + - / % *") == tokens
   end
+
+  test "tokenize an open and closed paren" do
+    assert tokenize("()") == [{:paren_open, "("}, {:paren_close, ")"}]
+  end
+
+  test "tokenize a series of parens" do
+    tokens = [
+      {:paren_open, "("},
+      {:paren_open, "("},
+      {:paren_close, ")"},
+      {:paren_close, ")"},
+      {:paren_close, ")"},
+      {:whitespace, " "},
+      {:paren_close, ")"},
+      {:paren_open, "("},
+      {:whitespace, " "},
+      {:paren_open, "("},
+      {:paren_close, ")"},
+    ]
+    assert tokenize("(())) )( ()") == tokens
+  end
 end

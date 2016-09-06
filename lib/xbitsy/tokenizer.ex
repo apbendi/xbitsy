@@ -25,6 +25,10 @@ defmodule Xbitsy.Tokenizer do
   def to_token("%"), do: {:modulus, "%"}
   def to_token("*"), do: {:multiplication, "*"}
 
+  # PARENS
+  def to_token("("), do: {:paren_open, "("}
+  def to_token(")"), do: {:paren_close, ")"}
+
   def to_token(lexeme = <<first::utf8, _tail::binary>>) do
     cond do
       is_white?(first) -> {:whitespace, lexeme}
