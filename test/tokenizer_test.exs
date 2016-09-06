@@ -57,4 +57,20 @@ defmodule TokenizerTest do
   test "lex an assignment with math in a program" do
     assert lex("BEGIN x=42 + 2*2 \tEND") == ["BEGIN", " ", "x", "=", "42", " ", "+", " ", "2", "*", "2", " \t", "END"]
   end
+
+  test "lex an open paren" do
+    assert lex("(") == ["("]
+  end
+
+  test "lex a close paren" do
+    assert lex(")") == [")"]
+  end
+
+  test "lex a series of parens" do
+    assert lex("()(()) )(") == ["(", ")", "(", "(", ")", ")", " ", ")", "("]
+  end
+
+  test "lex parens in a mathematical statement" do
+    assert lex("x=2*((1 + 1) - 42)") == ["x", "=", "2", "*", "(", "(", "1", " ", "+", " ", "1", ")", " ", "-", " ", "42", ")"] 
+  end
 end

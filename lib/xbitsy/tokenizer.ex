@@ -2,6 +2,8 @@ defmodule Xbitsy.Tokenizer do
 
   def lex(source), do: do_lex(source, [])
 
+  defp do_lex(source = << ?( :: utf8, tail :: binary >>, acc), do: do_lex(tail, ["(" | acc])
+  defp do_lex(source = << ?) :: utf8, tail :: binary >>, acc), do: do_lex(tail, [")" | acc])
   defp do_lex(source = << first :: utf8, tail :: binary >>, acc) do
     {lexeme, remaining} = source |> take_matching(matcher_for(first), "")
     do_lex(remaining, [lexeme | acc])
