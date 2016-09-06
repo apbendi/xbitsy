@@ -81,4 +81,12 @@ defmodule TokenizerTest do
   test "lex comments in a program" do
     assert lex("{ hi }BEGIN\n\tPRINT42\n{ prints forty two}\nEND\n\n{ /FIN }") == ["{ hi }", "BEGIN", "\n\t", "PRINT", "42", "\n", "{ prints forty two}", "\n", "END", "\n\n", "{ /FIN }"]
   end
+
+  test "tokenize the BEGIN keyword" do
+    assert tokenize("BEGIN") == [{:begin, "BEGIN"}]
+  end
+
+  test "tokenize the Bitsy null program" do
+    assert tokenize("BEGIN\nEND") == [{:begin, "BEGIN"}, {:whitespace, "\n"}, {:end, "END"}]
+  end
 end

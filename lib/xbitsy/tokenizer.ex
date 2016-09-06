@@ -1,5 +1,22 @@
 defmodule Xbitsy.Tokenizer do
 
+  def tokenize(source) do
+    source
+      |> lex
+      |> Enum.map(&to_token/1)
+  end
+
+  # KEYWORDS
+  def to_token("BEGIN"), do: {:begin, "BEGIN"}
+  def to_token("END"),   do: {:end, "END"}
+
+  def to_token(lexeme = <<first::utf8, _tail::binary>>) do
+    cond do
+      is_white?(first) -> {:whitespace, lexeme}
+      true -> raise "Unexpected lexical symbol: #{lexeme}"
+    end
+  end
+
   def lex(source), do: do_lex(source, [])
 
   defp do_lex(<< ?( :: utf8, tail :: binary >>, acc), do: do_lex(tail, ["(" | acc])
