@@ -17,6 +17,14 @@ defmodule Xbitsy.Tokenizer do
   def to_token("PRINT"),  do: {:print, "PRINT"}
   def to_token("READ"),   do: {:read, "READ"}
 
+  # OPERATORS
+  def to_token("="), do: {:assignment, "="}
+  def to_token("+"), do: {:addition, "+"}
+  def to_token("-"), do: {:subtraction, "-"}
+  def to_token("/"), do: {:division, "/"}
+  def to_token("%"), do: {:modulus, "%"}
+  def to_token("*"), do: {:multiplication, "*"}
+
   def to_token(lexeme = <<first::utf8, _tail::binary>>) do
     cond do
       is_white?(first) -> {:whitespace, lexeme}

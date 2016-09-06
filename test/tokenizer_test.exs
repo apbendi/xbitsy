@@ -108,4 +108,20 @@ defmodule TokenizerTest do
              ]
     assert tokenize("BEGIN\nIFZ\n\ELSE\nEND\nLOOP\nEND\nIFP\nEND\nIFN\nEND\nPRINT\nREAD\nEND\n") == tokens
   end
+
+  test "tokenize an assignment operator" do
+    assert tokenize("=") == [{:assignment, "="}]
+  end
+
+  test "tokenize a series of operators" do
+    tokens = [
+              {:assignment, "="}, {:whitespace, " "},
+              {:addition, "+"}, {:whitespace, " "},
+              {:subtraction, "-"}, {:whitespace, " "},
+              {:division, "/"}, {:whitespace, " "},
+              {:modulus, "%"}, {:whitespace, " "},
+              {:multiplication, "*"}
+             ]
+    assert tokenize("= + - / % *") == tokens
+  end
 end
