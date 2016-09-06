@@ -5,13 +5,11 @@ defmodule Xbitsy.Tokenizer do
   defp do_lex(<< ?( :: utf8, tail :: binary >>, acc), do: do_lex(tail, ["(" | acc])
   defp do_lex(<< ?) :: utf8, tail :: binary >>, acc), do: do_lex(tail, [")" | acc])
 
-  defp do_lex(source = << ?{ :: utf8, _tail :: binary >>, acc) do
-    {comment, remaining} = source |> take_comment("")
-    do_lex(remaining, [comment | acc])
-  end
-
   defp do_lex(source = << first :: utf8, _tail :: binary >>, acc) do
-    {lexeme, remaining} = source |> take_matching(matcher_for(first), "")
+    {lexeme, remaining} = case first do
+        ?{ -> source |> take_comment("")
+        _  -> source |> take_matching(matcher_for(first), "")
+      end 
     do_lex(remaining, [lexeme | acc])
   end
 
