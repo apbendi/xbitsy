@@ -7,44 +7,44 @@ defmodule Xbitsy.Tokenizer do
   end
 
   # KEYWORDS
-  def to_token("BEGIN"),  do: {:begin, "BEGIN"}
-  def to_token("END"),    do: {:end, "END"}
-  def to_token("IFP"),    do: {:ifp, "IFP"}
-  def to_token("IFZ"),    do: {:ifz, "IFZ"}
-  def to_token("IFN"),    do: {:ifn, "IFN"}
-  def to_token("ELSE"),   do: {:else, "ELSE"}
-  def to_token("LOOP"),   do: {:loop, "LOOP"}
-  def to_token("PRINT"),  do: {:print, "PRINT"}
-  def to_token("READ"),   do: {:read, "READ"}
+  defp to_token("BEGIN"),  do: {:begin, "BEGIN"}
+  defp to_token("END"),    do: {:end, "END"}
+  defp to_token("IFP"),    do: {:ifp, "IFP"}
+  defp to_token("IFZ"),    do: {:ifz, "IFZ"}
+  defp to_token("IFN"),    do: {:ifn, "IFN"}
+  defp to_token("ELSE"),   do: {:else, "ELSE"}
+  defp to_token("LOOP"),   do: {:loop, "LOOP"}
+  defp to_token("PRINT"),  do: {:print, "PRINT"}
+  defp to_token("READ"),   do: {:read, "READ"}
 
   # OPERATORS
-  def to_token("="), do: {:assignment, "="}
-  def to_token("+"), do: {:addition, "+"}
-  def to_token("-"), do: {:subtraction, "-"}
-  def to_token("/"), do: {:division, "/"}
-  def to_token("%"), do: {:modulus, "%"}
-  def to_token("*"), do: {:multiplication, "*"}
+  defp to_token("="), do: {:assignment, "="}
+  defp to_token("+"), do: {:addition, "+"}
+  defp to_token("-"), do: {:subtraction, "-"}
+  defp to_token("/"), do: {:division, "/"}
+  defp to_token("%"), do: {:modulus, "%"}
+  defp to_token("*"), do: {:multiplication, "*"}
 
   # PARENS
-  def to_token("("), do: {:paren_open, "("}
-  def to_token(")"), do: {:paren_close, ")"}
+  defp to_token("("), do: {:paren_open, "("}
+  defp to_token(")"), do: {:paren_close, ")"}
 
-  def to_token(lexeme = <<first::utf8, _tail::binary>>) do
+  defp to_token(lexeme = <<first::utf8, _tail::binary>>) do
     cond do
       ?{ == first      -> {:comment, lexeme}
       is_white?(first) -> {:whitespace, lexeme}
       is_ident?(first) -> {:variable, lexeme}
       is_num?(first)   -> {:integer, lexeme}
-      true -> raise "Unexpected lexical symbol: #{lexeme}"
+      true             -> raise "Unexpected lexical symbol: #{lexeme}"
     end
   end
 
   def lex(source), do: do_lex(source, [])
 
-  defp do_lex(<< ?( :: utf8, tail :: binary >>, acc), do: do_lex(tail, ["(" | acc])
-  defp do_lex(<< ?) :: utf8, tail :: binary >>, acc), do: do_lex(tail, [")" | acc])
+  defp do_lex(<<?(::utf8, tail::binary>>, acc), do: do_lex(tail, ["(" | acc])
+  defp do_lex(<<?)::utf8, tail::binary>>, acc), do: do_lex(tail, [")" | acc])
 
-  defp do_lex(source = << first :: utf8, _tail :: binary >>, acc) do
+  defp do_lex(source = <<first::utf8, _tail::binary>>, acc) do
     {lexeme, remaining} = case first do
         ?{ -> source |> take_comment("")
         _  -> source |> take_matching(matcher_for(first), "")
@@ -56,9 +56,9 @@ defmodule Xbitsy.Tokenizer do
     acc |> Enum.reverse
   end
 
-  defp take_matching(source = << first :: utf8, tail :: binary >>, matches?, acc) do
+  defp take_matching(source = <<first::utf8, tail::binary>>, matches?, acc) do
     if matches?.(first) do
-      tail |> take_matching(matches?, << acc::binary, first::utf8 >>)
+      tail |> take_matching(matches?, << acc::binary, first::utf8>>)
     else
      {acc, source}
     end
@@ -68,8 +68,8 @@ defmodule Xbitsy.Tokenizer do
     {acc, ""}
   end
 
-  defp take_comment(<< ?}::utf8, tail::binary >>, acc), do: {<< acc::binary, ?}::utf8>>, tail}
-  defp take_comment(<< first::utf8, tail::binary >>, acc) do
+  defp take_comment(<<?}::utf8, tail::binary >>, acc), do: {<<acc::binary, ?}::utf8>>, tail}
+  defp take_comment(<<first::utf8, tail::binary >>, acc) do
     take_comment(tail, << acc::binary, first::utf8 >>)  
   end
 
