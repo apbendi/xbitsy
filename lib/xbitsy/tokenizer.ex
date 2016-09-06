@@ -13,19 +13,20 @@ defmodule Xbitsy.Tokenizer do
     do_lex(remaining, [lexeme | acc])
   end
 
-  defp do_lex(<<>>, acc) do
+  defp do_lex("", acc) do
     acc |> Enum.reverse
   end
 
   defp take_matching(source = << first :: utf8, tail :: binary >>, matches?, acc) do
-    cond do
-      matches?.(first) -> tail |> take_matching(matches?, << acc::binary, first::utf8 >>)
-      true -> {acc, source}
+    if matches?.(first) do
+      tail |> take_matching(matches?, << acc::binary, first::utf8 >>)
+    else
+     {acc, source}
     end
   end
 
-  defp take_matching(<<>>, _matches?, acc) do
-    {acc, <<>>}
+  defp take_matching("", _matches?, acc) do
+    {acc, ""}
   end
 
   defp take_comment(<< ?}::utf8, tail::binary >>, acc), do: {<< acc::binary, ?}::utf8>>, tail}
