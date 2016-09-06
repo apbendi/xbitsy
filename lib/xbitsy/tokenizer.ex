@@ -31,7 +31,10 @@ defmodule Xbitsy.Tokenizer do
 
   def to_token(lexeme = <<first::utf8, _tail::binary>>) do
     cond do
+      ?{ == first      -> {:comment, lexeme}
       is_white?(first) -> {:whitespace, lexeme}
+      is_ident?(first) -> {:variable, lexeme}
+      is_num?(first)   -> {:integer, lexeme}
       true -> raise "Unexpected lexical symbol: #{lexeme}"
     end
   end

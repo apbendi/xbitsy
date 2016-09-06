@@ -145,4 +145,26 @@ defmodule TokenizerTest do
     ]
     assert tokenize("(())) )( ()") == tokens
   end
+
+  test "tokenize a variable name" do
+    assert tokenize("counter") == [{:variable, "counter"}]
+  end
+
+  test "tokenize an integer" do
+    assert tokenize("827") == [{:integer, "827"}]
+  end
+
+  test "tokenize a variable assignment" do
+    tokens = [
+      {:begin, "BEGIN"}, {:whitespace, "\n\t"},
+      {:variable, "x"}, {:assignment, "="},
+      {:integer, "116"}, {:whitespace, "\n"}, 
+      {:end, "END"}
+    ]
+    assert tokenize("BEGIN\n\tx=116\nEND") == tokens
+  end
+
+  test "tokenize a comment" do
+    assert tokenize("{ This is a comment }") == [{:comment, "{ This is a comment }"}]
+  end
 end
