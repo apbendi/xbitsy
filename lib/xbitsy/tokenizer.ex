@@ -2,9 +2,15 @@ defmodule Xbitsy.Tokenizer do
 
   def lex(source), do: do_lex(source, [])
 
-  defp do_lex(source = << ?( :: utf8, tail :: binary >>, acc), do: do_lex(tail, ["(" | acc])
-  defp do_lex(source = << ?) :: utf8, tail :: binary >>, acc), do: do_lex(tail, [")" | acc])
-  defp do_lex(source = << first :: utf8, tail :: binary >>, acc) do
+  defp do_lex(<< ?( :: utf8, tail :: binary >>, acc), do: do_lex(tail, ["(" | acc])
+  defp do_lex(<< ?) :: utf8, tail :: binary >>, acc), do: do_lex(tail, [")" | acc])
+
+  defp do_lex(source = << ?{ :: utf8, _tail :: binary >>, acc) do
+    {comment, remaining} = source |> take_comment("")
+    do_lex(remaining, [comment | acc])
+  end
+
+  defp do_lex(source = << first :: utf8, _tail :: binary >>, acc) do
     {lexeme, remaining} = source |> take_matching(matcher_for(first), "")
     do_lex(remaining, [lexeme | acc])
   end
@@ -22,6 +28,11 @@ defmodule Xbitsy.Tokenizer do
 
   defp take_matching(<<>>, _matches?, acc) do
     {acc, <<>>}
+  end
+
+  defp take_comment(<< ?}::utf8, tail::binary >>, acc), do: {<< acc::binary, ?}::utf8>>, tail}
+  defp take_comment(<< first::utf8, tail::binary >>, acc) do
+    take_comment(tail, << acc::binary, first::utf8 >>)  
   end
 
   defp matcher_for(char) do

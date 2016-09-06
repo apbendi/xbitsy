@@ -73,4 +73,12 @@ defmodule TokenizerTest do
   test "lex parens in a mathematical statement" do
     assert lex("x=2*((1 + 1) - 42)") == ["x", "=", "2", "*", "(", "(", "1", " ", "+", " ", "1", ")", " ", "-", " ", "42", ")"] 
   end
+
+  test "lex a comment" do
+    assert lex("{ Hello Comment }") == ["{ Hello Comment }"]
+  end
+
+  test "lex comments in a program" do
+    assert lex("{ hi }BEGIN\n\tPRINT42\n{ prints forty two}\nEND\n\n{ /FIN }") == ["{ hi }", "BEGIN", "\n\t", "PRINT", "42", "\n", "{ prints forty two}", "\n", "END", "\n\n", "{ /FIN }"]
+  end
 end
