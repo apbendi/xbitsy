@@ -24,15 +24,17 @@ defmodule Xbitsy.Tokenizer do
 
   defp matcher_for(char) do
     cond do
-      is_white?(char) -> &is_white?/1
-      is_ident?(char) -> &is_ident?/1
-      is_num?(char)   -> &is_num?/1
-      true -> raise "Illegal character #{char}"
+      is_white?(char)    -> &is_white?/1
+      is_ident?(char)    -> &is_ident?/1
+      is_num?(char)      -> &is_num?/1
+      is_operator?(char) -> &is_operator?/1
+      true               -> raise "Illegal character #{<<char>>}"
     end
   end
 
   # MATCHERS
-  defp is_white?(char), do: char == ?\s or char == ?\t or char == ?\n
-  defp is_ident?(char), do: (char >= ?A and char <= ?Z) or (char >= ?a and char <= ?z)
-  defp is_num?(char),   do: char >= ?0 and char <= ?9
+  defp is_white?(char),    do: char == ?\s or char == ?\t or char == ?\n
+  defp is_ident?(char),    do: (char >= ?A and char <= ?Z) or (char >= ?a and char <= ?z)
+  defp is_num?(char),      do: char >= ?0 and char <= ?9
+  defp is_operator?(char), do: char == ?= or char == ?* or char == ?/ or char == ?% or char == ?+ or char == ?-
 end

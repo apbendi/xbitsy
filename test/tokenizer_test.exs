@@ -45,4 +45,16 @@ defmodule TokenizerTest do
   test "lex a number in a program" do
     assert lex("BEGIN x 42 \tEND") == ["BEGIN", " ", "x", " ", "42", " \t", "END"]
   end
+
+  test "lex an operator" do
+    assert lex("=") == ["="]
+  end
+
+  test "lex a series of operators" do
+    assert lex("= + - * % /") == ["=", " ", "+", " ", "-", " ", "*", " ", "%", " ", "/"]
+  end
+
+  test "lex an assignment with math in a program" do
+    assert lex("BEGIN x=42 + 2*2 \tEND") == ["BEGIN", " ", "x", "=", "42", " ", "+", " ", "2", "*", "2", " \t", "END"]
+  end
 end
