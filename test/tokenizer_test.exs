@@ -89,4 +89,23 @@ defmodule TokenizerTest do
   test "tokenize the Bitsy null program" do
     assert tokenize("BEGIN\nEND") == [{:begin, "BEGIN"}, {:whitespace, "\n"}, {:end, "END"}]
   end
+
+  test "tokenize a series of keywords" do
+    tokens = [
+              {:begin, "BEGIN"}, {:whitespace, "\n"},
+              {:ifz, "IFZ"}, {:whitespace, "\n"},
+              {:else, "ELSE"}, {:whitespace, "\n"},
+              {:end, "END"}, {:whitespace, "\n"},
+              {:loop, "LOOP"}, {:whitespace, "\n"},
+              {:end, "END"}, {:whitespace, "\n"},
+              {:ifp, "IFP"}, {:whitespace, "\n"},
+              {:end, "END"}, {:whitespace, "\n"},
+              {:ifn, "IFN"}, {:whitespace, "\n"},
+              {:end, "END"}, {:whitespace, "\n"},
+              {:print, "PRINT"}, {:whitespace, "\n"},
+              {:read, "READ"}, {:whitespace, "\n"},
+              {:end, "END"}, {:whitespace, "\n"},
+             ]
+    assert tokenize("BEGIN\nIFZ\n\ELSE\nEND\nLOOP\nEND\nIFP\nEND\nIFN\nEND\nPRINT\nREAD\nEND\n") == tokens
+  end
 end

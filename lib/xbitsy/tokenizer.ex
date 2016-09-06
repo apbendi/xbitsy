@@ -7,8 +7,15 @@ defmodule Xbitsy.Tokenizer do
   end
 
   # KEYWORDS
-  def to_token("BEGIN"), do: {:begin, "BEGIN"}
-  def to_token("END"),   do: {:end, "END"}
+  def to_token("BEGIN"),  do: {:begin, "BEGIN"}
+  def to_token("END"),    do: {:end, "END"}
+  def to_token("IFP"),    do: {:ifp, "IFP"}
+  def to_token("IFZ"),    do: {:ifz, "IFZ"}
+  def to_token("IFN"),    do: {:ifn, "IFN"}
+  def to_token("ELSE"),   do: {:else, "ELSE"}
+  def to_token("LOOP"),   do: {:loop, "LOOP"}
+  def to_token("PRINT"),  do: {:print, "PRINT"}
+  def to_token("READ"),   do: {:read, "READ"}
 
   def to_token(lexeme = <<first::utf8, _tail::binary>>) do
     cond do
