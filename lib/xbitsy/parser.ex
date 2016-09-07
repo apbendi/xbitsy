@@ -5,24 +5,28 @@ defmodule Xbitsy.Parser do
             program
     end
 
-    # UTILS
+    # UTILITY FUNCTIONS
+
+    defp match([], expected_type), do: raise "[ERROR] Unexpected end of tokens when expecting: #{expected_type}"
 
     defp match([{current_type, value} | tail_tokens], expected_type) do
         if expected_type == current_type do
+            tail_tokens = tail_tokens |> skip_over
             {value, tail_tokens}
         else
             raise "[ERROR] Expecting #{expected_type} token but received #{current_type}"
         end
     end
 
-    defp match([], expected_type), do: raise "[ERROR] Unexpected end of tokens when expecting: #{expected_type}"
+    defp skip_over([{:whitespace, _} | tail_tokens]), do: skip_over(tail_tokens)
+    defp skip_over([{:comment, _}    | tail_tokens]), do: skip_over(tail_tokens)
+    defp skip_over(tokens),  do: tokens
 
     # RECURSIVE DESCENT
 
     defp program(tokens) do
         try do
             {_, tokens} = tokens |> match(:begin)
-            {_, tokens} = tokens |> match(:whitespace)
             {_, tokens} = tokens |> match(:end)
             {:ok, nil}
         rescue
