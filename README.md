@@ -3,7 +3,7 @@
 XBitsy is an interpreter for the [Bitsy](https://github.com/apbendi/bitsyspec)
 language implemented in Elixir.
 
-🚨 NOTE: This project is a work in progress, and is currently very much incomplete
+🚨 NOTE: This project is a work in progress, and is currently very much incomplete.
 
 ## Bitsy
 
@@ -30,7 +30,7 @@ If you're attending either, be sure to say hello!
 
 ## Requirements
 
-This project is being developed with Elixir 1.3.2 on OS X El Capitant (10.11.5).
+This project is being developed with Elixir 1.3.2 on OS X El Capitan (10.11.5).
 No other configurations have yet been tested.
 
 ## Installation and Usage
