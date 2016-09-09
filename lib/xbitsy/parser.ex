@@ -31,7 +31,26 @@ defmodule Xbitsy.Parser do
 
     defp program(tokens) do
         {_, tokens} = tokens |> match(:begin)
-        {_, tokens} = tokens |> match(:end)
+        tokens = block(tokens)
+        {_, _tokens} = tokens |> match(:end)
         {:ok, nil}
+    end
+
+    defp block([]), do: raise "[ERROR] Unterminated block"
+    defp block(tokens = [{:end, _token_value} | _tail_tokens]), do: tokens
+    defp block(tokens = [{token_type, token_value} | tail_tokens]) do
+        tokens = case token_type do
+            :loop -> loop(tokens)
+            _ -> raise "[ERROR] Unexpected token in block #{token_value}"
+        end
+
+        block(tokens)
+    end
+
+    defp loop(tokens) do
+        {_, tokens} = tokens |> match(:loop)
+        tokens = block(tokens)
+        {_, tokens} = tokens |> match(:end)
+        tokens
     end
 end

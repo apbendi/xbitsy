@@ -13,10 +13,12 @@ defmodule ParserTest do
   defp keyword(tokens, symbol), do: [{symbol, String.upcase to_string(symbol) } | tokens]
   defp kBEGIN(tokens), do: tokens |> keyword(:begin)
   defp kEND(tokens), do: tokens |> keyword(:end)
+  defp kLOOP(tokens), do: tokens |> keyword(:loop)
 
   defp whitespace(tokens, string), do: [{:whitespace, string} | tokens]
   defp newline(tokens), do: tokens |> whitespace("\n")
   defp space(tokens), do: tokens |> whitespace(" ")
+  defp tab(tokens), do: tokens |> whitespace("\t")
 
   defp comment(tokens, string), do: [{:comment, "{#{string}}"} | tokens]
 
@@ -52,4 +54,27 @@ defmodule ParserTest do
      assert parse(tokens) == {:ok, nil}
   end
 
+  test "parse a bitsy program with a loop" do
+      tokens = start_tokens
+                    |> kBEGIN |> newline
+                    |> tab |> kLOOP |> newline
+                    |> tab |> kEND |> newline
+                    |> kEND
+                |> finish_tokens
+
+      assert parse(tokens) == {:ok, nil}
+  end
+
+  test "parse a bitsy program with a nested loop" do
+      tokens = start_tokens
+                    |> kBEGIN |> newline
+                    |> tab |> kLOOP |> newline
+                    |> tab |> tab |> kLOOP |> newline
+                    |> tab |> tab |> kEND |> newline
+                    |> tab |> kEND |> newline
+                    |> kEND
+                |> finish_tokens
+
+      assert parse(tokens) == {:ok, nil}
+  end
 end
