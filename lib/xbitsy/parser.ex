@@ -12,9 +12,13 @@ defmodule Xbitsy.Parser do
 
     # UTILITY FUNCTIONS
 
-    defp match([], expected_type), do: raise "[ERROR] Unexpected end of tokens when expecting: #{expected_type}"
+    defp match(tokens, expected_type) do
+        {_value, tail_tokens} = tokens |> match_extract(expected_type)
+        tail_tokens
+    end
 
-    defp match([{current_type, value} | tail_tokens], expected_type) do
+    defp match_extract([], expected_type), do: raise "[ERROR] Unexpected end of tokens when expecting: #{expected_type}"
+    defp match_extract([{current_type, value} | tail_tokens], expected_type) do
         if expected_type == current_type do
             tail_tokens = tail_tokens |> skip_over
             {value, tail_tokens}
@@ -30,14 +34,16 @@ defmodule Xbitsy.Parser do
     # RECURSIVE DESCENT
 
     defp program(tokens) do
-        {_, tokens} = tokens |> match(:begin)
-        tokens = block(tokens)
-        {_, _tokens} = tokens |> match(:end)
+        tokens
+            |> match(:begin)
+            |> block
+            |> match(:end)
+        
         {:ok, nil}
     end
 
     defp block([]), do: raise "[ERROR] Unterminated block"
-    defp block(tokens = [{:end, _token_value} | _tail_tokens]), do: tokens
+    defp block(tokens = [{:end, _} | _]), do: tokens
     defp block(tokens = [{token_type, token_value} | tail_tokens]) do
         tokens = case token_type do
             :loop -> loop(tokens)
@@ -48,9 +54,9 @@ defmodule Xbitsy.Parser do
     end
 
     defp loop(tokens) do
-        {_, tokens} = tokens |> match(:loop)
-        tokens = block(tokens)
-        {_, tokens} = tokens |> match(:end)
         tokens
+            |> match(:loop)
+            |> block
+            |> match(:end)
     end
 end
