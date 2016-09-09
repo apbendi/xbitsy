@@ -1,8 +1,13 @@
 defmodule Xbitsy.Parser do
     
     def parse(tokens) do
-        tokens |>
-            program
+        try do
+            tokens
+                |> skip_over 
+                |> program
+        rescue
+            e in RuntimeError -> {:error, e.message}
+        end
     end
 
     # UTILITY FUNCTIONS
@@ -25,12 +30,8 @@ defmodule Xbitsy.Parser do
     # RECURSIVE DESCENT
 
     defp program(tokens) do
-        try do
-            {_, tokens} = tokens |> match(:begin)
-            {_, tokens} = tokens |> match(:end)
-            {:ok, nil}
-        rescue
-            e in RuntimeError -> {:error, e.message}
-        end
+        {_, tokens} = tokens |> match(:begin)
+        {_, tokens} = tokens |> match(:end)
+        {:ok, nil}
     end
 end

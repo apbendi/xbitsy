@@ -16,6 +16,9 @@ defmodule ParserTest do
 
   defp whitespace(tokens, string), do: [{:whitespace, string} | tokens]
   defp newline(tokens), do: tokens |> whitespace("\n")
+  defp space(tokens), do: tokens |> whitespace(" ")
+
+  defp comment(tokens, string), do: [{:comment, "{#{string}}"} | tokens]
 
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
@@ -37,6 +40,16 @@ defmodule ParserTest do
 
       {status, _} = parse(tokens)
       assert status == :ok
+  end
+
+  test "parse the bitsy null program with comments" do
+      tokens = start_tokens
+                    |> comment("Opening comment") |> newline
+                    |> kBEGIN |> newline |> comment("A comment\nIn the middle") |> newline
+                    |> kEND |> space |> comment("A comment at the end!")
+                |> finish_tokens
+     
+     assert parse(tokens) == {:ok, nil}
   end
 
 end
