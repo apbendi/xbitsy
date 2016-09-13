@@ -43,15 +43,16 @@ defmodule Xbitsy.Parser do
         {:ok, tree}
     end
 
-    defp block([]), do: raise "[ERROR] Unterminated block"
-    defp block(tokens = [{:end, _token_value} | _tail_tokens]), do: {tokens, %{kind: :block, statements: []}}
-    defp block(tokens = [{token_type, token_value} | _tail_tokens]) do
-         {tokens, _node} = case token_type do
+    defp block(tokens, statements \\ [])
+    defp block([], _statements), do: raise "[ERROR] Unterminated block"
+    defp block(tokens = [{:end, _token_value} | _tail_tokens], statements), do: {tokens, %{kind: :block, statements: Enum.reverse(statements)}}
+    defp block(tokens = [{token_type, token_value} | _tail_tokens], statements) do
+         {tokens, node} = case token_type do
             :loop -> loop(tokens)
             _ -> raise "[ERROR] Unexpected token in block #{token_value}"
         end
 
-        block(tokens)
+        block(tokens, [node | statements])
     end
 
     defp loop(tokens) do
@@ -59,6 +60,6 @@ defmodule Xbitsy.Parser do
         {tokens, node} = tokens |> block
         tokens = tokens |> match(:end)
         
-        {tokens, node}
+        {tokens, %{kind: :loop, block: node}}
     end
 end
