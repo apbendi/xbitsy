@@ -40,8 +40,9 @@ defmodule ParserTest do
                     |> kEND 
                |> finish_tokens
 
-      {status, _} = parse(tokens)
+      {status, tree} = parse(tokens)
       assert status == :ok
+      assert tree == %{kind: :program, block: %{kind: :block, statements: []}}
   end
 
   test "parse the bitsy null program with comments" do
@@ -51,7 +52,8 @@ defmodule ParserTest do
                     |> kEND |> space |> comment("A comment at the end!")
                 |> finish_tokens
      
-     assert parse(tokens) == {:ok, nil}
+    {status, _tree} = parse(tokens)
+    assert status == :ok
   end
 
   test "parse a bitsy program with a loop" do
@@ -62,7 +64,8 @@ defmodule ParserTest do
                     |> kEND
                 |> finish_tokens
 
-      assert parse(tokens) == {:ok, nil}
+      {status, _tree} = parse(tokens)
+      assert status == :ok
   end
 
   test "parse a bitsy program with a nested loop" do
@@ -75,6 +78,7 @@ defmodule ParserTest do
                     |> kEND
                 |> finish_tokens
 
-      assert parse(tokens) == {:ok, nil}
+      {status, _tree} = parse(tokens)
+      assert status == :ok
   end
 end

@@ -34,18 +34,19 @@ defmodule Xbitsy.Parser do
     # RECURSIVE DESCENT
 
     defp program(tokens) do
-        tokens
-            |> match(:begin)
-            |> block
-            |> match(:end)
+        tokens = tokens |> match(:begin)
+        {tokens, node} = tokens |> block
+        tokens |> match(:end)
+
+        tree = %{kind: :program, block: node}
         
-        {:ok, nil}
+        {:ok, tree}
     end
 
     defp block([]), do: raise "[ERROR] Unterminated block"
-    defp block(tokens = [{:end, _} | _]), do: tokens
-    defp block(tokens = [{token_type, token_value} | tail_tokens]) do
-        tokens = case token_type do
+    defp block(tokens = [{:end, _token_value} | _tail_tokens]), do: {tokens, %{kind: :block, statements: []}}
+    defp block(tokens = [{token_type, token_value} | _tail_tokens]) do
+         {tokens, _node} = case token_type do
             :loop -> loop(tokens)
             _ -> raise "[ERROR] Unexpected token in block #{token_value}"
         end
@@ -54,9 +55,10 @@ defmodule Xbitsy.Parser do
     end
 
     defp loop(tokens) do
-        tokens
-            |> match(:loop)
-            |> block
-            |> match(:end)
+        tokens = tokens |> match(:loop)
+        {tokens, node} = tokens |> block
+        tokens = tokens |> match(:end)
+        
+        {tokens, node}
     end
 end
