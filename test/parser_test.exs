@@ -24,7 +24,13 @@ defmodule ParserTest do
 
   # CONVENIENCE TREE BUILDERS
 
-  defp empty_block(), do: %{kind: :block, statements: []}
+  defp program(block), do: %{kind: :program, block: block}
+
+  defp block(statements), do: %{kind: :block, statements: statements}
+  defp empty_block(), do: block([])
+
+  defp loop(block), do: %{kind: :loop, block: block}
+  defp empty_loop(), do: loop(empty_block) 
 
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
@@ -46,7 +52,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == %{kind: :program, block: empty_block()}
+      assert tree == program(empty_block)
   end
 
   test "parse the bitsy null program with comments" do
@@ -58,7 +64,7 @@ defmodule ParserTest do
      
     {status, tree} = parse(tokens)
     assert status == :ok
-    assert tree == %{kind: :program, block: empty_block()}
+    assert tree == program(empty_block)
   end
 
   test "parse a bitsy program with a loop" do
@@ -71,7 +77,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == %{kind: :program, block: %{kind: :block, statements: [%{kind: :loop, block: empty_block()}] }}
+      assert tree == program(block([empty_loop]))
   end
 
   test "parse a bitsy program with a nested loop" do
@@ -84,7 +90,8 @@ defmodule ParserTest do
                     |> kEND
                 |> finish_tokens
 
-      {status, _tree} = parse(tokens)
+      {status, tree} = parse(tokens)
       assert status == :ok
+      assert tree == program block [ loop block [empty_loop] ]
   end
 end
