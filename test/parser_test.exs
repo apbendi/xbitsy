@@ -21,6 +21,10 @@ defmodule ParserTest do
   defp tab(tokens), do: tokens |> whitespace("\t")
 
   defp comment(tokens, string), do: [{:comment, "{#{string}}"} | tokens]
+  defp variable(tokens, string), do: [{:variable, string} | tokens]
+  defp integer(tokens, string), do: [{:integer, string} | tokens]
+
+  defp opAssignment(tokens), do: [{:assignment, "="} | tokens]
 
   # CONVENIENCE TREE BUILDERS
 
@@ -93,5 +97,21 @@ defmodule ParserTest do
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program block [ loop block [empty_loop] ]
+  end
+
+  test "parse a bitsy program with an int literal assignment" do
+      tokens = start_tokens
+                    |> kBEGIN |> newline
+                    |> tab |> variable("foo") |> opAssignment |> integer("42")
+                    |> kEND
+               |> finish_tokens
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == %{kind: :program, block: 
+                                        %{kind: :block, statements: [
+                                            %{kind: :assignment, variable: %{kind: :variable, name: "foo"}, value: %{kind: :integer, value: "42"}}
+                                        ]}
+                                    }
   end
 end
