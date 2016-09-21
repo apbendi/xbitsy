@@ -42,7 +42,7 @@ defmodule ParserTest do
 
   defp assignment(var_name, value_node), do: %{kind: :assignment, variable: variable(var_name), value: value_node}
 
-  defp addition(left_node, right_node), do: %{kind: :addition, left: left_node, right: right_nodde}
+  defp addition(left_node, right_node), do: %{kind: :addition, left: left_node, right: right_node}
 
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
@@ -130,14 +130,6 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-
-      assert tree == %{kind: :program, block: 
-                                    %{kind: :block, statements: [
-                                        %{kind: :assignment, variable: %{kind: :variable, name: "bar"}, value: %{kind: :addition, left:  %{kind: :integer, value: "116"}, 
-                                                                                                                                  right: %{kind: :addition, left: %{kind: :integer, value: "827"}, right: %{kind: :integer, value: "42"}}
-                                                                                                                }
-                                        }
-                                    ]}
-                                }
+      assert tree = program block [assignment("bar", addition("116", addition("827", "42")))]
   end
 end
