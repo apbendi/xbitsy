@@ -82,6 +82,9 @@ defmodule Xbitsy.Parser do
            :addition -> 
                {tokens, right_node} = tokens |> match(:addition) |> expression
                {tokens, %{kind: :addition, left: node, right: right_node}}
+           :subtraction ->
+               {tokens, right_node} = tokens |> match(:subtraction) |> expression
+               {tokens, %{kind: :subtraction, left: node, right: right_node}}
            _ -> {tokens, node}
         end
     end

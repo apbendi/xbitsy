@@ -26,6 +26,7 @@ defmodule ParserTest do
 
   defp opAssignment(tokens), do: [{:assignment, "="} | tokens]
   defp opAdd(tokens), do: [{:addition, "+"} | tokens]
+  defp opSubtract(tokens), do: [{:subtraction, "-"} | tokens]
 
   # CONVENIENCE TREE BUILDERS
 
@@ -43,6 +44,7 @@ defmodule ParserTest do
   defp assignment(var_name, value_node), do: %{kind: :assignment, variable: variable(var_name), value: value_node}
 
   defp addition(left_node, right_node), do: %{kind: :addition, left: left_node, right: right_node}
+  defp subtraction(left_node, right_node), do: %{kind: :subtraction, left: left_node, right: right_node}
 
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
@@ -130,6 +132,20 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree = program block [assignment("bar", addition("116", addition("827", "42")))]
+      assert tree == program block [assignment("bar", addition(integer("116"), addition(integer("827"), integer("42"))))]
+  end
+
+  test "parse a bitsy program with the addtion and subtraction of three int literals" do
+      tokens = start_tokens
+                    |> kBEGIN |> newline
+                    |> tab |> variable("bar") |> opAssignment 
+                    |> integer("116") |> opAdd |> integer("827") |> opSubtract |> integer("42") |> newline
+                    |> kEND
+              |> finish_tokens
+      
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program block [assignment("bar", addition(integer("116"), subtraction(integer("827"), integer("42"))))]
   end
 end
