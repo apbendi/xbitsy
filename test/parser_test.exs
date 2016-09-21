@@ -35,7 +35,12 @@ defmodule ParserTest do
   defp empty_block(), do: block([])
 
   defp loop(block), do: %{kind: :loop, block: block}
-  defp empty_loop(), do: loop(empty_block) 
+  defp empty_loop(), do: loop(empty_block)
+
+  defp variable(name), do: %{kind: :variable, name: name}
+  defp integer(value), do: %{kind: :integer, value: value}
+
+  defp assignment(var_name, value_node), do: %{kind: :assignment, variable: variable(var_name), value: value_node} 
 
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
@@ -109,11 +114,13 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == %{kind: :program, block: 
-                                        %{kind: :block, statements: [
-                                            %{kind: :assignment, variable: %{kind: :variable, name: "foo"}, value: %{kind: :integer, value: "42"}}
-                                        ]}
-                                    }
+    #   assert tree == %{kind: :program, block: 
+    #                                     %{kind: :block, statements: [
+    #                                         %{kind: :assignment, variable: %{kind: :variable, name: "foo"}, value: %{kind: :integer, value: "42"}}
+    #                                     ]}
+    #                                 }
+
+     assert tree == program block [assignment("foo", integer "42")]
   end
 
   test "parse a bitsy program with the addtion of three int literals" do
