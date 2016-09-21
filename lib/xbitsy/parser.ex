@@ -67,9 +67,27 @@ defmodule Xbitsy.Parser do
     defp assignment(tokens) do
         {tokens, var_name} = tokens |> match_extract(:variable)
         tokens = tokens |> match(:assignment)
-        {tokens, integer} = tokens |> match_extract(:integer)
+        #{tokens, integer} = tokens |> match_extract(:integer)
+        {tokens, exp_node} = tokens |> expression
         
-        node = %{kind: :assignment, variable: %{kind: :variable, name: var_name}, value: %{kind: :integer, value: "42"}}
+        node = %{kind: :assignment, variable: %{kind: :variable, name: var_name}, value: exp_node}
         {tokens,  node}
+    end
+
+    defp expression(tokens = [{_token_type, _token_value} | _tail_tokens]) do
+        {tokens, node} = tokens |> term
+        {next_type, _next_value} = hd(tokens)
+
+        case next_type do
+           :addition -> tokens |> match(:addition) |> expression
+           _ -> {tokens, node}
+        end
+    end
+
+    def term(tokens) do
+        {tokens, integer} = tokens |> match_extract(:integer)
+        node = %{kind: :integer, value: integer}
+
+        {tokens, node}
     end
 end

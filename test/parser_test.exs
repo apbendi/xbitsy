@@ -25,6 +25,7 @@ defmodule ParserTest do
   defp integer(tokens, string), do: [{:integer, string} | tokens]
 
   defp opAssignment(tokens), do: [{:assignment, "="} | tokens]
+  defp opAdd(tokens), do: [{:addition, "+"} | tokens]
 
   # CONVENIENCE TREE BUILDERS
 
@@ -113,5 +114,18 @@ defmodule ParserTest do
                                             %{kind: :assignment, variable: %{kind: :variable, name: "foo"}, value: %{kind: :integer, value: "42"}}
                                         ]}
                                     }
+  end
+
+  test "parse a bitsy program with the addtion of three int literals" do
+      tokens = start_tokens
+                    |> kBEGIN |> newline
+                    |> tab |> variable("bar") |> opAssignment 
+                    |> integer("116") |> opAdd |> integer("827") |> opAdd |> integer("42") |> newline
+                    |> kEND
+              |> finish_tokens
+      
+
+      {status, _tree} = parse(tokens)
+      assert status == :ok
   end
 end
