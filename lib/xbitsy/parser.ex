@@ -79,7 +79,9 @@ defmodule Xbitsy.Parser do
         {next_type, _next_value} = hd(tokens)
 
         case next_type do
-           :addition -> tokens |> match(:addition) |> expression
+           :addition -> 
+               {tokens, right_node} = tokens |> match(:addition) |> expression
+               {tokens, %{kind: :addition, left: node, right: right_node}}
            _ -> {tokens, node}
         end
     end

@@ -40,7 +40,9 @@ defmodule ParserTest do
   defp variable(name), do: %{kind: :variable, name: name}
   defp integer(value), do: %{kind: :integer, value: value}
 
-  defp assignment(var_name, value_node), do: %{kind: :assignment, variable: variable(var_name), value: value_node} 
+  defp assignment(var_name, value_node), do: %{kind: :assignment, variable: variable(var_name), value: value_node}
+
+  defp addition(left_node, right_node), do: %{kind: :addition, left: left_node, right: right_nodde}
 
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
@@ -114,13 +116,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-    #   assert tree == %{kind: :program, block: 
-    #                                     %{kind: :block, statements: [
-    #                                         %{kind: :assignment, variable: %{kind: :variable, name: "foo"}, value: %{kind: :integer, value: "42"}}
-    #                                     ]}
-    #                                 }
-
-     assert tree == program block [assignment("foo", integer "42")]
+      assert tree == program block [assignment("foo", integer "42")]
   end
 
   test "parse a bitsy program with the addtion of three int literals" do
@@ -132,7 +128,16 @@ defmodule ParserTest do
               |> finish_tokens
       
 
-      {status, _tree} = parse(tokens)
+      {status, tree} = parse(tokens)
       assert status == :ok
+
+      assert tree == %{kind: :program, block: 
+                                    %{kind: :block, statements: [
+                                        %{kind: :assignment, variable: %{kind: :variable, name: "bar"}, value: %{kind: :addition, left:  %{kind: :integer, value: "116"}, 
+                                                                                                                                  right: %{kind: :addition, left: %{kind: :integer, value: "827"}, right: %{kind: :integer, value: "42"}}
+                                                                                                                }
+                                        }
+                                    ]}
+                                }
   end
 end
