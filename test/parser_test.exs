@@ -14,6 +14,7 @@ defmodule ParserTest do
   defp kBEGIN(tokens), do: tokens |> keyword(:begin)
   defp kEND(tokens), do: tokens |> keyword(:end)
   defp kLOOP(tokens), do: tokens |> keyword(:loop)
+  defp kPRINT(tokens), do: tokens |> keyword(:print)
 
   defp whitespace(tokens, string), do: [{:whitespace, string} | tokens]
   defp newline(tokens), do: tokens |> whitespace("\n")
@@ -37,6 +38,8 @@ defmodule ParserTest do
 
   defp loop(block), do: %{kind: :loop, block: block}
   defp empty_loop(), do: loop(empty_block)
+
+ defp print(value_node), do: %{kind: :print, value: value_node}
 
   defp variable(name), do: %{kind: :variable, name: name}
   defp integer(value), do: %{kind: :integer, value: value}
@@ -147,5 +150,17 @@ defmodule ParserTest do
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program block [assignment("bar", addition(integer("116"), subtraction(integer("827"), integer("42"))))]
+  end
+
+  test "parse a bitsy program that prints an integer literal" do
+      tokens = start_tokens
+                |> kBEGIN |> newline
+                |> tab |> kPRINT |> space |> integer("116") |> newline
+                |> kEND
+            |> finish_tokens
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program block [print integer("116")]
   end
 end

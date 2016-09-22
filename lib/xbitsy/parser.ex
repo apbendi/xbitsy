@@ -48,8 +48,9 @@ defmodule Xbitsy.Parser do
     defp block(tokens = [{:end, _token_value} | _tail_tokens], statements), do: {tokens, %{kind: :block, statements: Enum.reverse(statements)}}
     defp block(tokens = [{token_type, token_value} | _tail_tokens], statements) do
          {tokens, node} = case token_type do
-            :loop -> loop(tokens)
+            :loop     -> loop(tokens)
             :variable -> assignment(tokens)
+            :print    -> print(tokens)
             _ -> raise "[ERROR] Unexpected token in block #{token_value}"
         end
 
@@ -62,6 +63,13 @@ defmodule Xbitsy.Parser do
         tokens = tokens |> match(:end)
         
         {tokens, %{kind: :loop, block: node}}
+    end
+
+    defp print(tokens) do
+        tokens = tokens |> match(:print)
+        {tokens, exp_node} = tokens |> expression
+
+        {tokens, %{kind: :print, value: exp_node}}
     end
 
     defp assignment(tokens) do
