@@ -163,4 +163,16 @@ defmodule ParserTest do
       assert status == :ok
       assert tree == program block [print integer("116")]
   end
+
+  test "parse a bitsy program that prints a subtraction of integer literals" do
+      tokens = start_tokens
+                |> kBEGIN |> newline
+                |> tab |> kPRINT |> space |> integer("827") |> space |> opSubtract |> space |> integer("116") |> newline
+                |> kEND
+            |> finish_tokens
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program block [print subtraction(integer("827"), integer("116"))]
+  end
 end
