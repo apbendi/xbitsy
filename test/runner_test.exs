@@ -35,4 +35,18 @@ defmodule RunnerTest do
         assert status == :ok
         assert print_output == ["116", "827", "114"]
     end
+
+    test "it should run a program adding two integer literals" do
+        tree = %{kind: :program, block: %{kind: :block, statements: [
+            %{kind: :print, value: %{kind: :addition, 
+                                        left: %{kind: :integer, value: "116"}, 
+                                        right: %{kind: :integer, value: "827"}
+                                    }
+            }]
+        }}
+
+        {status, print_output} = run(tree)
+        assert status == :ok
+        assert print_output == ["943"]
+    end
 end

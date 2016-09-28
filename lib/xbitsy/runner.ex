@@ -33,12 +33,17 @@ defmodule Xbitsy.Runner do
     defp do_print(%{kind: :print, value: node}) do
         node_value = evaluate(node)
         IO.puts node_value
-        [node_value]
+        ["#{node_value}"]
     end
 
     # EVALUATE EXPRESSIONS
 
-    defp evaluate(%{kind: :integer, value: int_string}), do: int_string
+    defp evaluate(%{kind: :integer, value: int_string}), do: int_string |> Integer.parse |> elem(0)
+    defp evaluate(%{kind: :addition, left: left_node, right: right_node}) do
+        [left_node, right_node]
+            |> Enum.map(&evaluate/1)
+            |> Enum.reduce(&(&1 + &2))
+    end
 
     # HELPERS
 
