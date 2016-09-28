@@ -5,6 +5,7 @@ defmodule ParserTest do
   @moduletag timeout: 1000
 
   import Xbitsy.Parser
+  import TreeBuilder
 
   # CONVENIENCE TOKEN BUILDERS
   defp start_tokens(), do: []
@@ -28,26 +29,6 @@ defmodule ParserTest do
   defp opAssignment(tokens), do: [{:assignment, "="} | tokens]
   defp opAdd(tokens), do: [{:addition, "+"} | tokens]
   defp opSubtract(tokens), do: [{:subtraction, "-"} | tokens]
-
-  # CONVENIENCE TREE BUILDERS
-
-  defp program(block), do: %{kind: :program, block: block}
-
-  defp block(statements), do: %{kind: :block, statements: statements}
-  defp empty_block(), do: block([])
-
-  defp loop(block), do: %{kind: :loop, block: block}
-  defp empty_loop(), do: loop(empty_block)
-
- defp print(value_node), do: %{kind: :print, value: value_node}
-
-  defp variable(name), do: %{kind: :variable, name: name}
-  defp integer(value), do: %{kind: :integer, value: value}
-
-  defp assignment(var_name, value_node), do: %{kind: :assignment, variable: variable(var_name), value: value_node}
-
-  defp addition(left_node, right_node), do: %{kind: :addition, left: left_node, right: right_node}
-  defp subtraction(left_node, right_node), do: %{kind: :subtraction, left: left_node, right: right_node}
 
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
