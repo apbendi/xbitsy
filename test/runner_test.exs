@@ -33,8 +33,26 @@ defmodule RunnerTest do
     test "it should run a program adding two integer literals" do
         tree = program block [print addition(integer("116"), integer("827"))]
         {status, print_output} = run(tree)
-        
+
         assert status == :ok
         assert print_output == ["943"]
+    end
+
+    test "it should run a program subtracting two integer literals" do
+        tree = program block [print subtraction(integer("827"), integer("116"))]
+        {status, print_output} = run(tree)
+
+        assert status == :ok
+        assert print_output == ["711"]
+    end
+
+    test "it should run a program subtracting two integers from a third" do
+        tree = program block [print subtraction(integer("10"), subtraction(integer("2"), integer("1")))]
+        {status, print_output} = run(tree)
+
+        IO.inspect tree
+
+        assert status == :ok
+        assert print_output == ["7"]
     end
 end
