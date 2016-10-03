@@ -84,36 +84,16 @@ defmodule Xbitsy.Parser do
 
     defp expression(tokens = [{_token_type, _token_value} | _tail_tokens]) do
         {tokens, node} = tokens |> term
-
-        do_binary(tokens, node)
-        # {next_type, _next_value} = hd(tokens)
-
-        # case next_type do
-        #    :addition -> 
-        #        {tokens, right_node} = tokens |> match(:addition) |> expression
-        #        {tokens, %{kind: :addition, left: node, right: right_node}}
-        #    :subtraction ->
-        #        {tokens, right_node} = tokens |> match(:subtraction) |> expression
-        #        {tokens, %{kind: :subtraction, left: node, right: right_node}}
-        #    _ -> {tokens, node}
-        # end
+        binary_add_op(tokens, node)
     end
 
-    defp do_binary(tokens, left_node) do
-        {next_type, _next_value} = hd(tokens)
-
-        case next_type do
-           :addition -> 
-               {tokens, right_node} = tokens |> match(:addition) |> term
-               new_node = %{kind: :addition, left: left_node, right: right_node}
-               do_binary(tokens, new_node)
-           :subtraction ->
-               {tokens, right_node} = tokens |> match(:subtraction) |> term
-               new_node = %{kind: :subtraction, left: left_node, right: right_node}
-               do_binary(tokens, new_node)
-           _ -> {tokens, left_node}
-        end
+    defp binary_add_op(tokens = [{next_type, _next_value} | _tail_tokens], left_node) when next_type == :addition or next_type == :subtraction do
+        {tokens, right_node} = tokens |> match(next_type) |> term
+        new_node = %{kind: next_type, left: left_node, right: right_node}
+        binary_add_op(tokens, new_node)
     end
+
+    defp binary_add_op(tokens, left_node), do: {tokens, left_node}
 
     defp term(tokens) do
         {tokens, integer} = tokens |> match_extract(:integer)
