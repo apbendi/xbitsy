@@ -45,6 +45,12 @@ defmodule Xbitsy.Runner do
             |> Enum.reduce(&(&1 + &2))
     end
 
+    defp evaluate(%{kind: :subtraction, left: left_node, right: right_node}) do
+        left_val = evaluate(left_node)
+        right_val = evaluate(right_node)
+        left_val - right_val
+    end
+
     # HELPERS
 
     defp append_prints(acc, new_prints), do: List.flatten [acc | new_prints]

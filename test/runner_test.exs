@@ -47,7 +47,7 @@ defmodule RunnerTest do
     end
 
     test "it should run a program subtracting two integers from a third" do
-        tree = program block [print subtraction(integer("10"), subtraction(integer("2"), integer("1")))]
+        tree = program block [print subtraction(subtraction(integer("10"), integer("2")), integer("1"))]
         {status, print_output} = run(tree)
 
         IO.inspect tree
