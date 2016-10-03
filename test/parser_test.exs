@@ -109,14 +109,14 @@ defmodule ParserTest do
       tokens = start_tokens
                     |> kBEGIN |> newline
                     |> tab |> variable("bar") |> opAssignment 
-                    |> integer("116") |> opAdd |> integer("827") |> opAdd |> integer("42") |> newline
+                    |> integer("116") |> opAdd |> integer("827") |> opAdd |> integer("42") |> newline # 116 + 827 + 42
                     |> kEND
               |> finish_tokens
       
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [assignment("bar", addition(integer("116"), addition(integer("827"), integer("42"))))]
+      assert tree == program block [assignment("bar", addition(addition(integer("116"), integer("827")), integer("42")))]
   end
 
   test "parse a bitsy program with the addtion and subtraction of three int literals" do
@@ -130,7 +130,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [assignment("bar", addition(integer("116"), subtraction(integer("827"), integer("42"))))]
+      assert tree == program block [assignment("bar", subtraction(addition(integer("116"), integer("827")), integer("42")))]
   end
 
   test "parse a bitsy program that prints an integer literal" do
