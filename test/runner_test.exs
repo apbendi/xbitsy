@@ -53,4 +53,28 @@ defmodule RunnerTest do
         assert status == :ok
         assert print_output == ["7"]
     end
+
+    test "it should run a program multiplying two integers" do
+        tree = program block [print multiplication(integer("2"), integer("8"))]
+        {status, print_output} = run(tree)
+
+        assert status == :ok
+        assert print_output == ["16"]
+    end
+
+    test "it should run a program dividing two integers" do
+        tree = program block [print division(integer("8"), integer("2"))]
+        {status, print_output} = run(tree)
+
+        assert status == :ok
+        assert print_output == ["4"]
+    end
+
+    test "it should run a program performing the modulus of two integers" do
+        tree = program block [print modulus(integer("27"), integer("6"))]
+        {status, print_output} = run(tree)
+
+        assert status == :ok
+        assert print_output == ["3"]
+    end
 end

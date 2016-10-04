@@ -41,6 +41,9 @@ defmodule Xbitsy.Runner do
     defp evaluate(%{kind: :integer, value: int_string}), do: int_string |> Integer.parse |> elem(0)
     defp evaluate(%{kind: :addition, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &+/2)
     defp evaluate(%{kind: :subtraction, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &-/2)
+    defp evaluate(%{kind: :multiplication, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &*/2)
+    defp evaluate(%{kind: :division, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &div/2)
+    defp evaluate(%{kind: :modulus, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &rem/2)
 
     defp evaluate_binary(left_node, right_node, operation) do
         [right_node, left_node]
@@ -49,6 +52,6 @@ defmodule Xbitsy.Runner do
     end
 
     # HELPERS
-    
+
     defp append_prints(acc, new_prints), do: List.flatten [acc | new_prints]
 end
