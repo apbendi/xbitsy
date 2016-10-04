@@ -30,6 +30,7 @@ defmodule ParserTest do
   defp opAdd(tokens), do: [{:addition, "+"} | tokens]
   defp opSubtract(tokens), do: [{:subtraction, "-"} | tokens]
   defp opMultiply(tokens), do: [{:multiplication, "*"} | tokens]
+  defp opDivide(tokens), do: [{:division, "/"} | tokens]
 
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
@@ -168,5 +169,17 @@ defmodule ParserTest do
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program block [print multiplication(integer("2"), integer("7"))]
+  end
+
+  test "parse a bitsy program that prints the division of integer literals" do
+      tokens = start_tokens
+                |> kBEGIN |> newline
+                |> kPRINT |> tab |> integer("116") |> opDivide |> integer("2") |> newline
+                |> kEND
+            |> finish_tokens
+      
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program block [print division(integer("116"), integer("2"))]
   end
 end
