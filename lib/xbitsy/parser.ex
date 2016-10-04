@@ -96,6 +96,19 @@ defmodule Xbitsy.Parser do
     defp binary_add_op(tokens, left_node), do: {tokens, left_node}
 
     defp term(tokens) do
+        {tokens, node} = tokens |> factor
+        binary_mul_op(tokens, node)
+    end
+
+    defp binary_mul_op(tokens = [{next_type, _next_value} | _tail_tokens], left_node) when next_type == :multiplication or next_type == :division do
+        {tokens, right_node} = tokens |> match(next_type) |> factor
+        new_node = %{kind: next_type, left: left_node, right: right_node}
+        binary_mul_op(tokens, new_node)
+    end
+
+    defp binary_mul_op(tokens, left_node), do: {tokens, left_node}
+
+    defp factor(tokens) do
         {tokens, integer} = tokens |> match_extract(:integer)
         node = %{kind: :integer, value: integer}
 
