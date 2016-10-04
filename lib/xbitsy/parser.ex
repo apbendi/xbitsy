@@ -75,7 +75,6 @@ defmodule Xbitsy.Parser do
     defp assignment(tokens) do
         {tokens, var_name} = tokens |> match_extract(:variable)
         tokens = tokens |> match(:assignment)
-        #{tokens, integer} = tokens |> match_extract(:integer)
         {tokens, exp_node} = tokens |> expression
         
         node = %{kind: :assignment, variable: %{kind: :variable, name: var_name}, value: exp_node}
@@ -100,7 +99,8 @@ defmodule Xbitsy.Parser do
         binary_mul_op(tokens, node)
     end
 
-    defp binary_mul_op(tokens = [{next_type, _next_value} | _tail_tokens], left_node) when next_type == :multiplication or next_type == :division do
+    defp binary_mul_op(tokens = [{next_type, _next_value} | _tail_tokens], left_node) 
+            when next_type == :multiplication or next_type == :division or next_type == :modulus do                
         {tokens, right_node} = tokens |> match(next_type) |> factor
         new_node = %{kind: next_type, left: left_node, right: right_node}
         binary_mul_op(tokens, new_node)

@@ -31,6 +31,7 @@ defmodule ParserTest do
   defp opSubtract(tokens), do: [{:subtraction, "-"} | tokens]
   defp opMultiply(tokens), do: [{:multiplication, "*"} | tokens]
   defp opDivide(tokens), do: [{:division, "/"} | tokens]
+  defp opModulus(tokens), do: [{:modulus, "%"} | tokens]
 
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
@@ -181,5 +182,17 @@ defmodule ParserTest do
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program block [print division(integer("116"), integer("2"))]
+  end
+
+  test "parse a bitsy program that prints the modulus of integer literals" do
+      tokens = start_tokens
+            |> kBEGIN |> newline
+            |> tab |> kPRINT |> space |> integer("27") |> space |> opModulus |> space |> integer("6") |> newline
+            |> kEND
+        |> finish_tokens
+
+     {status, tree} = parse(tokens)
+     assert status == :ok
+     assert tree == program block [print modulus(integer("27"), integer("6"))]
   end
 end

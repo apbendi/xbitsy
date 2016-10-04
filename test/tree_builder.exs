@@ -18,4 +18,5 @@ defmodule TreeBuilder do
     def subtraction(left_node, right_node), do: %{kind: :subtraction, left: left_node, right: right_node}
     def multiplication(left_node, right_node), do: %{kind: :multiplication, left: left_node, right: right_node}
     def division(left_node, right_node), do: %{kind: :division, left: left_node, right: right_node}
+    def modulus(left_node, right_node), do: %{kind: :modulus, left: left_node, right: right_node}
 end
