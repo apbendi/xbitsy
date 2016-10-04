@@ -95,7 +95,7 @@ defmodule Xbitsy.Parser do
     defp binary_add_op(tokens, left_node), do: {tokens, left_node}
 
     defp term(tokens) do
-        {tokens, node} = tokens |> factor
+        {tokens, node} = tokens |> signed_factor
         binary_mul_op(tokens, node)
     end
 
@@ -107,6 +107,19 @@ defmodule Xbitsy.Parser do
     end
 
     defp binary_mul_op(tokens, left_node), do: {tokens, left_node}
+
+    defp signed_factor(tokens = [ {next_type, _next_value} | _tail_tokens]) do
+        case next_type do
+            :subtraction ->
+                {tokens, factor_node} = tokens |> match(:subtraction) |> factor
+                negate_node = %{kind: :subtraction, left: %{kind: :integer, value: "0"}, right: factor_node}
+                {tokens, negate_node}
+            :addition ->
+                tokens |> match(:addition) |> factor
+            _ -> 
+                tokens |> factor
+        end
+    end
 
     defp factor(tokens) do
         {tokens, integer} = tokens |> match_extract(:integer)
