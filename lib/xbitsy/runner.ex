@@ -39,19 +39,16 @@ defmodule Xbitsy.Runner do
     # EVALUATE EXPRESSIONS
 
     defp evaluate(%{kind: :integer, value: int_string}), do: int_string |> Integer.parse |> elem(0)
-    defp evaluate(%{kind: :addition, left: left_node, right: right_node}) do
-        [left_node, right_node]
-            |> Enum.map(&evaluate/1)
-            |> Enum.reduce(&(&1 + &2))
-    end
+    defp evaluate(%{kind: :addition, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &+/2)
+    defp evaluate(%{kind: :subtraction, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &-/2)
 
-    defp evaluate(%{kind: :subtraction, left: left_node, right: right_node}) do
-        left_val = evaluate(left_node)
-        right_val = evaluate(right_node)
-        left_val - right_val
+    defp evaluate_binary(left_node, right_node, operation) do
+        [right_node, left_node]
+            |> Enum.map(&evaluate/1)
+            |> Enum.reduce(operation)
     end
 
     # HELPERS
-
+    
     defp append_prints(acc, new_prints), do: List.flatten [acc | new_prints]
 end

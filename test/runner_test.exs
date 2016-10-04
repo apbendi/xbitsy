@@ -50,8 +50,6 @@ defmodule RunnerTest do
         tree = program block [print subtraction(subtraction(integer("10"), integer("2")), integer("1"))]
         {status, print_output} = run(tree)
 
-        IO.inspect tree
-
         assert status == :ok
         assert print_output == ["7"]
     end
