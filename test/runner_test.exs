@@ -77,4 +77,12 @@ defmodule RunnerTest do
         assert status == :ok
         assert print_output == ["3"]
     end
+
+    test "it should run a program with parenthesized expression" do
+        tree = program block [print multiplication(integer("2"), addition(integer("1"), integer("6")))]
+        {status, print_output} = run(tree)
+
+        assert status == :ok
+        assert print_output == ["14"]
+    end
 end

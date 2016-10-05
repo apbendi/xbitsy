@@ -33,6 +33,9 @@ defmodule ParserTest do
   defp opDivide(tokens), do: [{:division, "/"} | tokens]
   defp opModulus(tokens), do: [{:modulus, "%"} | tokens]
 
+  defp paren_open(tokens), do: [{:paren_open, "("} | tokens]
+  defp paren_close(tokens), do: [{:paren_close, ")"} | tokens]
+
   # CONVENIENCE VALIDATORS
   defp is_error?({:error, <<"[ERROR]"::binary, _tail::binary>>}), do: true
   defp is_error?(_response), do: false
@@ -204,5 +207,18 @@ defmodule ParserTest do
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program block [print subtraction(integer("0"), integer("54"))]
+  end
+
+  test "parse a bitsy program with a parenthesized expression" do
+      tokens = start_tokens
+            |> kBEGIN |> newline
+            |> tab |> kPRINT |> space |> integer("2") |> opMultiply 
+            |> paren_open |> integer("1") |> opAdd |> integer("6") |> paren_close |> newline
+            |> kEND
+        |> finish_tokens
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program block [print multiplication(integer("2"), addition(integer("1"), integer("6")))]
   end
 end

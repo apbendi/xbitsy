@@ -121,10 +121,18 @@ defmodule Xbitsy.Parser do
         end
     end
 
-    defp factor(tokens) do
-        {tokens, integer} = tokens |> match_extract(:integer)
-        node = %{kind: :integer, value: integer}
-
-        {tokens, node}
+    defp factor(tokens = [{next_type, _next_value} | _tail_tokens]) do
+        case next_type do
+            :integer ->
+                {tokens, integer} = tokens |> match_extract(:integer)
+                node = %{kind: :integer, value: integer}
+                {tokens, node}
+            :paren_open ->
+                {tokens, node} = tokens |> match(:paren_open) |> expression
+                tokens = tokens |> match(:paren_close)
+                {tokens, node}
+            _ ->
+                raise "[ERROR] Unexpected token in expression; received #{next_type}"
+        end
     end
 end
