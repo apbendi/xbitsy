@@ -50,6 +50,8 @@ defmodule Xbitsy.Parser do
     defp block(tokens = [{token_type, token_value} | _tail_tokens], statements) do
          {tokens, node} = case token_type do
             :ifz      -> if_statement(tokens)
+            :ifp      -> if_statement(tokens)
+            :ifn      -> if_statement(tokens)
             :loop     -> loop(tokens)
             :variable -> assignment(tokens)
             :print    -> print(tokens)
@@ -59,14 +61,14 @@ defmodule Xbitsy.Parser do
         block(tokens, [node | statements])
     end
 
-    defp if_statement(tokens) do
-        tokens = tokens |> match(:ifz)
+    defp if_statement(tokens = [{if_type, _} | _tail_tokens]) when if_type == :ifz or if_type == :ifn or if_type == :ifp do
+        tokens = tokens |> match(if_type)
         {tokens, exp_node} = tokens |> expression
         {tokens, conditional_statements} = tokens |> block
         {tokens, else_statements} = tokens |> else_statement
         tokens = tokens |> match(:end)
 
-        {tokens, %{kind: :ifz, test: exp_node, statements: conditional_statements, else_statements: else_statements}}
+        {tokens, %{kind: if_type, test: exp_node, statements: conditional_statements, else_statements: else_statements}}
     end
 
     defp else_statement(tokens = [{next_type, _} | _tail_tokens]) do

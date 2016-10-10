@@ -17,6 +17,8 @@ defmodule ParserTest do
   defp kLOOP(tokens), do: tokens |> keyword(:loop)
   defp kPRINT(tokens), do: tokens |> keyword(:print)
   defp kIFZ(tokens), do: tokens |> keyword(:ifz)
+  defp kIFP(tokens), do: tokens |> keyword(:ifp)
+  defp kIFN(tokens), do: tokens |> keyword(:ifn)
   defp kELSE(tokens), do: tokens |> keyword(:else)
 
   defp whitespace(tokens, string), do: [{:whitespace, string} | tokens]
@@ -281,5 +283,33 @@ defmodule ParserTest do
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program [ ifz(integer("0"), [print integer("1")]), ifz(variable("x"), [print integer("16")]) ]
+  end
+
+  test "parse a bitsy program with an IFP conditional" do
+      tokens = start_tokens
+            |> kBEGIN |> newline
+            |> tab |> kIFP |> space |> integer("16") |> newline
+            |> tab |> tab |> kPRINT |> space |> integer("27") |> newline
+            |> tab |> kEND
+            |> kEND
+        |> finish_tokens
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program [ ifp(integer("16"), [print integer("27")]) ]
+  end
+
+  test "parse a bitsy program with an IFN conditional" do
+      tokens = start_tokens
+            |> kBEGIN |> newline
+            |> tab |> kIFN |> space |> integer("-116") |> newline
+            |> tab |> tab |> kPRINT |> space |> integer("27") |> newline
+            |> tab |> kEND
+            |> kEND
+        |> finish_tokens
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program [ ifn(integer("-116"), [print integer("27")]) ]
   end
 end

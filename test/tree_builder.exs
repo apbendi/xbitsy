@@ -3,6 +3,8 @@ defmodule TreeBuilder do
 
     def if(kind, test_node, statements, else_statements), do: %{kind: kind, test: test_node, statements: statements, else_statements: else_statements}
     def ifz(test_node, statements, else_statements \\ []), do: if(:ifz, test_node, statements, else_statements)
+    def ifp(test_node, statements, else_statements \\ []), do: if(:ifp, test_node, statements, else_statements)
+    def ifn(test_node, statements, else_statements \\ []), do: if(:ifn, test_node, statements, else_statements)
     def loop(statements), do: %{kind: :loop, statements: statements}
     def empty_loop(), do: loop([])
 
