@@ -1,44 +1,44 @@
 defmodule Xbitsy.Runner do
 
-    defstruct prints: [], var_vals: %{} # program state
+    # program state
+    defstruct prints: [], var_vals: %{}
     
     def run({:ok, tree}), do: run(tree)
     def run({:error, message}), do: IO.puts message
 
     def run(_tree = %{kind: :program, statements: statement_list}) do
-        final_state = run_statements(statement_list)
+        final_state = empty_state 
+                    |> run_statements(statement_list)
+
         {:ok, final_state}
     end
 
     # RUN STATEMENT LIST
+    defp run_statements(state, []), do: state
 
-    defp run_statements(statement_list, state \\ %Xbitsy.Runner{})
-
-    defp run_statements([], state), do: state
-
-    defp run_statements([first_statement | tail_statements], state) do
+    defp run_statements(state, [first_statement | tail_statements]) do
         {:ok, statement_kind} = Map.fetch(first_statement, :kind)
 
         state = 
         case statement_kind do
-            :print -> do_print(first_statement, state)
-            :assignment -> do_assignment(first_statement, state)
+            :print      -> state |> do_print(first_statement)
+            :assignment -> state |> do_assignment(first_statement)
             _ -> raise "Unexpected Kind of Statement: #{statement_kind}"
         end
 
-        run_statements(tail_statements, state)
+        state |> run_statements(tail_statements)
     end
 
     # DO STATEMENTS
 
-    defp do_print(%{kind: :print, value: node}, state) do
+    defp do_print(state, %{kind: :print, value: node}) do
         node_value = evaluate(state, node)
         IO.puts node_value
 
        state |> append_prints(["#{node_value}"])
     end
 
-    defp do_assignment(%{kind: :assignment, variable: %{kind: :variable, name: var_name}, value: val_node}, state) do
+    defp do_assignment(state, %{kind: :assignment, variable: %{kind: :variable, name: var_name}, value: val_node}) do
        node_value = evaluate(state, val_node)
        state |> assign_var(var_name, node_value)  
     end
@@ -68,6 +68,8 @@ defmodule Xbitsy.Runner do
     end
 
     # HELPERS
+
+    defp empty_state(), do: %Xbitsy.Runner{}
 
     defp append_prints(state, new_prints) do
         put_in(state.prints, List.flatten [state.prints | new_prints])
