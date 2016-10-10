@@ -1,6 +1,6 @@
 defmodule Xbitsy.Runner do
 
-    defstruct prints: [] # program state
+    defstruct prints: [], var_vals: %{} # program state
     
     def run({:ok, tree}), do: run(tree)
     def run({:error, message}), do: IO.puts message
@@ -21,7 +21,7 @@ defmodule Xbitsy.Runner do
 
         state = 
         case statement_kind do
-            :print -> do_print(first_statement, state)
+            :print -> do_print(first_statement, state) 
             _ -> raise "Unexpected Kind of Statement: #{statement_kind}"
         end
 
@@ -31,7 +31,7 @@ defmodule Xbitsy.Runner do
     # DO STATEMENTS
 
     defp do_print(%{kind: :print, value: node}, state) do
-        node_value = evaluate(node)
+        node_value = evaluate(state, node)
         IO.puts node_value
 
        state |> append_prints(["#{node_value}"])
@@ -39,17 +39,25 @@ defmodule Xbitsy.Runner do
 
     # EVALUATE EXPRESSIONS
 
-    defp evaluate(%{kind: :integer, value: int_string}), do: int_string |> Integer.parse |> elem(0)
-    defp evaluate(%{kind: :variable, name: _var_name}), do: 0 
-    defp evaluate(%{kind: :addition, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &+/2)
-    defp evaluate(%{kind: :subtraction, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &-/2)
-    defp evaluate(%{kind: :multiplication, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &*/2)
-    defp evaluate(%{kind: :division, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &div/2)
-    defp evaluate(%{kind: :modulus, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &rem/2)
+    defp evaluate(state, %{kind: :variable, name: var_name}) do
+        variable_value = state.var_vals[var_name]
 
-    defp evaluate_binary(left_node, right_node, operation) do
+        case variable_value do
+            nil -> 0
+            _   -> variable_value 
+        end
+    end
+
+    defp evaluate(_state, %{kind: :integer, value: int_string}), do: int_string |> Integer.parse |> elem(0) 
+    defp evaluate(state, %{kind: :addition, left: left_node, right: right_node}), do: state |> evaluate_binary(left_node, right_node, &+/2)
+    defp evaluate(state, %{kind: :subtraction, left: left_node, right: right_node}), do: state |> evaluate_binary(left_node, right_node, &-/2)
+    defp evaluate(state, %{kind: :multiplication, left: left_node, right: right_node}), do: state |> evaluate_binary(left_node, right_node, &*/2)
+    defp evaluate(state, %{kind: :division, left: left_node, right: right_node}), do: state |> evaluate_binary(left_node, right_node, &div/2)
+    defp evaluate(state, %{kind: :modulus, left: left_node, right: right_node}), do: state |> evaluate_binary(left_node, right_node, &rem/2)
+
+    defp evaluate_binary(state, left_node, right_node, operation) do
         [right_node, left_node]
-            |> Enum.map(&evaluate/1)
+            |> Enum.map(&(evaluate(state, &1)))
             |> Enum.reduce(operation)
     end
 
