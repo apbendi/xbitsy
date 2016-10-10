@@ -19,14 +19,16 @@ defmodule Xbitsy.Runner do
     defp run_statements(state, [first_statement | tail_statements]) do
         {:ok, statement_kind} = Map.fetch(first_statement, :kind)
 
-        state = 
+        statement_processor = 
         case statement_kind do
-            :print      -> state |> do_print(first_statement)
-            :assignment -> state |> do_assignment(first_statement)
+            :print      -> &do_print/2
+            :assignment -> &do_assignment/2
             _ -> raise "Unexpected Kind of Statement: #{statement_kind}"
         end
 
-        state |> run_statements(tail_statements)
+        state 
+            |> statement_processor.(first_statement) 
+            |> run_statements(tail_statements)
     end
 
     # DO STATEMENTS
