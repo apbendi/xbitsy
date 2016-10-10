@@ -7,7 +7,7 @@ defmodule Xbitsy.Runner do
 
     def run(_tree = %{kind: :program, statements: statement_list}) do
         final_state = run_statements(statement_list)
-        {:ok, final_state.prints}
+        {:ok, final_state}
     end
 
     # RUN STATEMENT LIST
