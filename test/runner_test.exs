@@ -93,4 +93,13 @@ defmodule RunnerTest do
         assert status == :ok
         assert final_state.prints == ["0"]
     end
+
+    test "it should run a program that assigns to and prints a variable" do
+        tree = program [assignment("myVar", integer("827")), print(variable("myVar"))]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints == ["827"]
+        assert final_state.var_vals == %{"myVar" => 827}
+    end
 end

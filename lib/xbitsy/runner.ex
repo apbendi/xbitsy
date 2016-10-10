@@ -21,7 +21,8 @@ defmodule Xbitsy.Runner do
 
         state = 
         case statement_kind do
-            :print -> do_print(first_statement, state) 
+            :print -> do_print(first_statement, state)
+            :assignment -> do_assignment(first_statement, state)
             _ -> raise "Unexpected Kind of Statement: #{statement_kind}"
         end
 
@@ -35,6 +36,11 @@ defmodule Xbitsy.Runner do
         IO.puts node_value
 
        state |> append_prints(["#{node_value}"])
+    end
+
+    defp do_assignment(%{kind: :assignment, variable: %{kind: :variable, name: var_name}, value: val_node}, state) do
+       node_value = evaluate(state, val_node)
+       state |> assign_var(var_name, node_value)  
     end
 
     # EVALUATE EXPRESSIONS
@@ -65,5 +71,9 @@ defmodule Xbitsy.Runner do
 
     defp append_prints(state, new_prints) do
         put_in(state.prints, List.flatten [state.prints | new_prints])
+    end
+
+    defp assign_var(state, var_name, var_value) do
+        put_in(state.var_vals, Map.put(state.var_vals, var_name, var_value))
     end
 end
