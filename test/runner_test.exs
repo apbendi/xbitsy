@@ -126,4 +126,12 @@ defmodule RunnerTest do
         assert status == :ok
         assert final_state.prints ==["-1"]
     end
+
+    test "it should run a program that branches on multiple IFZ statement" do
+        tree = program [ ifz(integer("0"), [print integer("1")]), ifz(variable("x"), [print integer("16")]) ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints ==["1", "16"]
+    end
 end

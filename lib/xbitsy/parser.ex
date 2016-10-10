@@ -64,6 +64,7 @@ defmodule Xbitsy.Parser do
         {tokens, exp_node} = tokens |> expression
         {tokens, conditional_statements} = tokens |> block
         {tokens, else_statements} = tokens |> else_statement
+        tokens = tokens |> match(:end)
 
         {tokens, %{kind: :ifz, test: exp_node, statements: conditional_statements, else_statements: else_statements}}
     end

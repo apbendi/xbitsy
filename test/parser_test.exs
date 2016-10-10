@@ -265,4 +265,21 @@ defmodule ParserTest do
       assert status == :ok
       assert tree == program [ ifz(integer("0"), [print integer("1")], [print integer("-1")]) ]
   end
+
+  test "parse a bitsy program with multiple IFZ conditional statements" do
+      tokens = start_tokens
+            |> kBEGIN |> newline
+            |> tab |> kIFZ |> space |> integer("0") |> newline
+            |> tab |> tab |> kPRINT |> space |> integer("1") |> newline
+            |> tab |> kEND |> newline |> newline
+            |> tab |> kIFZ |> space |> variable("x") |> newline
+            |> tab |> tab |> kPRINT |> space |> integer("16") |> newline
+            |> tab |> kEND |> newline
+            |> kEND
+        |> finish_tokens
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program [ ifz(integer("0"), [print integer("1")]), ifz(variable("x"), [print integer("16")]) ]
+  end
 end
