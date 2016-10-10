@@ -17,6 +17,7 @@ defmodule ParserTest do
   defp kLOOP(tokens), do: tokens |> keyword(:loop)
   defp kPRINT(tokens), do: tokens |> keyword(:print)
   defp kIFZ(tokens), do: tokens |> keyword(:ifz)
+  defp kELSE(tokens), do: tokens |> keyword(:else)
 
   defp whitespace(tokens, string), do: [{:whitespace, string} | tokens]
   defp newline(tokens), do: tokens |> whitespace("\n")
@@ -246,6 +247,22 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree = program [ ifz([print integer("1")]) ]
+      assert tree == program [ ifz(integer("0"), [print integer("1")]) ]
+  end
+
+  test "parse a bitsy program with an IFZ...ELSE conditional" do
+      tokens = start_tokens
+            |> kBEGIN |> newline
+            |> tab |> kIFZ |> space |> integer("0") |> newline
+            |> tab |> tab |> kPRINT |> space |> integer("1") |> newline
+            |> tab |> kELSE |> newline
+            |> tab |> tab |> kPRINT |> space |> integer("-1") |> newline
+            |> tab |> kEND
+            |> kEND
+        |> finish_tokens
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program [ ifz(integer("0"), [print integer("1")], [print integer("-1")]) ]
   end
 end

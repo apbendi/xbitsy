@@ -45,7 +45,8 @@ defmodule Xbitsy.Parser do
 
     defp block(tokens, statements \\ [])
     defp block([], _statements), do: raise "[ERROR] Unterminated block"
-    defp block(tokens = [{:end, _token_value} | _tail_tokens], statements), do: {tokens, Enum.reverse(statements)}
+    defp block(tokens = [{:end, _token_value} | _tail_tokens], statements), do: {tokens, Enum.reverse(statements)} # Can/should we DRY this?
+    defp block(tokens = [{:else, _token_value} | _tail_tokens], statements), do: {tokens, Enum.reverse(statements)}
     defp block(tokens = [{token_type, token_value} | _tail_tokens], statements) do
          {tokens, node} = case token_type do
             :ifz      -> if_statement(tokens)
@@ -62,8 +63,18 @@ defmodule Xbitsy.Parser do
         tokens = tokens |> match(:ifz)
         {tokens, exp_node} = tokens |> expression
         {tokens, conditional_statements} = tokens |> block
+        {tokens, else_statements} = tokens |> else_statement
 
-        {tokens, %{kind: :ifz, test: exp_node, statements: conditional_statements, else_statements: []}}
+        {tokens, %{kind: :ifz, test: exp_node, statements: conditional_statements, else_statements: else_statements}}
+    end
+
+    defp else_statement(tokens = [{next_type, _} | _tail_tokens]) do
+        if :else == next_type do
+            tokens = tokens |> match(:else)
+            tokens |> block 
+        else
+            {tokens, []}
+        end
     end
 
     defp loop(tokens) do
