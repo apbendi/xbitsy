@@ -40,6 +40,7 @@ defmodule Xbitsy.Runner do
     # EVALUATE EXPRESSIONS
 
     defp evaluate(%{kind: :integer, value: int_string}), do: int_string |> Integer.parse |> elem(0)
+    defp evaluate(%{kind: :variable, name: _var_name}), do: 0 
     defp evaluate(%{kind: :addition, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &+/2)
     defp evaluate(%{kind: :subtraction, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &-/2)
     defp evaluate(%{kind: :multiplication, left: left_node, right: right_node}), do: evaluate_binary(left_node, right_node, &*/2)

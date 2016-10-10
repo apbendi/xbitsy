@@ -85,4 +85,12 @@ defmodule RunnerTest do
         assert status == :ok
         assert print_output == ["14"]
     end
+
+    test "it should run a program that prints an expression using an unassigned expression" do
+        tree = program [print multiplication(integer("2"), variable("new_var"))]
+        {status, print_output} = run(tree)
+
+        assert status == :ok
+        assert print_output == ["0"]
+    end
 end
