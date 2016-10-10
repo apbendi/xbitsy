@@ -22,6 +22,8 @@ defmodule Xbitsy.Runner do
         statement_processor = 
         case statement_kind do
             :ifz        -> &do_if/2
+            :ifp        -> &do_if/2
+            :ifn        -> &do_if/2
             :print      -> &do_print/2
             :assignment -> &do_assignment/2
             _ -> raise "Unexpected Kind of Statement: #{statement_kind}"
@@ -34,10 +36,11 @@ defmodule Xbitsy.Runner do
 
     # DO STATEMENTS
 
-    defp do_if(state, %{kind: :ifz, test: test_node, statements: statements, else_statements: else_statements}) do
+    defp do_if(state, %{kind: if_type, test: test_node, statements: statements, else_statements: else_statements}) do
         node_value = evaluate(state, test_node)
+        branch? = test_for_if(if_type)
 
-        branch_statements = if 0 == node_value do
+        branch_statements = if branch?.(node_value) do
             statements
         else
             else_statements
@@ -92,5 +95,14 @@ defmodule Xbitsy.Runner do
 
     defp assign_var(state, var_name, var_value) do
         put_in(state.var_vals, Map.put(state.var_vals, var_name, var_value))
+    end
+
+    defp test_for_if(type) do
+        case type do
+            :ifz -> fn n -> n == 0 end
+            :ifn -> fn n -> n < 0 end
+            :ifp -> fn n -> n > 0 end
+            _    -> raise "Internal error: expecting an if conditional type but received #{type}"
+        end
     end
 end

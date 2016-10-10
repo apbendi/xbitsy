@@ -132,6 +132,22 @@ defmodule RunnerTest do
         {status, final_state} = run(tree)
 
         assert status == :ok
-        assert final_state.prints ==["1", "16"]
+        assert final_state.prints == ["1", "16"]
+    end
+
+    test "it should run a program that branches on an IFN statement" do
+        tree = program [ ifn(integer("-116"), [print integer("27")]) ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints == ["27"]
+    end
+
+    test "it should run a program that branches on an IFP statement" do
+        tree = program [ ifp(integer("116"), [print integer("27")]) ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints == ["27"]
     end
 end
