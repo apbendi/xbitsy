@@ -102,4 +102,28 @@ defmodule RunnerTest do
         assert final_state.prints == ["827"]
         assert final_state.var_vals == %{"myVar" => 827}
     end
+
+    test "it should run a program that branches on an IFZ statement" do
+        tree = program [ ifz(integer("0"), [print integer("1")]) ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints ==["1"]
+    end
+
+    test "it should run a program that branches on an IFZ...ELSE statement" do
+        tree = program [ ifz(multiplication(integer("1"), variable("x")), [print integer("1")], [print integer("-1")]) ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints ==["1"]
+    end
+
+    test "it should run a program that takes the else branch on an IFZ...ELSE statement" do
+        tree = program [ ifz(subtraction(variable("VARNAME"), integer("1")), [print integer("1")], [print integer("-1")]) ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints ==["-1"]
+    end
 end

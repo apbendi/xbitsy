@@ -21,6 +21,7 @@ defmodule Xbitsy.Runner do
 
         statement_processor = 
         case statement_kind do
+            :ifz        -> &do_if/2
             :print      -> &do_print/2
             :assignment -> &do_assignment/2
             _ -> raise "Unexpected Kind of Statement: #{statement_kind}"
@@ -32,6 +33,18 @@ defmodule Xbitsy.Runner do
     end
 
     # DO STATEMENTS
+
+    defp do_if(state, %{kind: :ifz, test: test_node, statements: statements, else_statements: else_statements}) do
+        node_value = evaluate(state, test_node)
+
+        branch_statements = if 0 == node_value do
+            statements
+        else
+            else_statements
+        end
+
+        state |> run_statements(branch_statements)
+    end
 
     defp do_print(state, %{kind: :print, value: node}) do
         node_value = evaluate(state, node)
