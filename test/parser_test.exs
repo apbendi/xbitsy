@@ -15,6 +15,7 @@ defmodule ParserTest do
   defp kBEGIN(tokens), do: tokens |> keyword(:begin)
   defp kEND(tokens), do: tokens |> keyword(:end)
   defp kLOOP(tokens), do: tokens |> keyword(:loop)
+  defp kBREAK(tokens), do: tokens |> keyword(:break)
   defp kPRINT(tokens), do: tokens |> keyword(:print)
   defp kIFZ(tokens), do: tokens |> keyword(:ifz)
   defp kIFP(tokens), do: tokens |> keyword(:ifp)
@@ -311,5 +312,20 @@ defmodule ParserTest do
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program [ ifn(integer("-116"), [print integer("27")]) ]
+  end
+
+  test "parse a bitsy program with a LOOP and immediate BREAK" do
+      tokens = start_tokens
+            |> kBEGIN |> newline
+            |> tab |> kLOOP |> newline
+            |> tab |> tab |> kPRINT |> space |> integer("827") |> newline
+            |> tab |> tab |> kBREAK |> newline
+            |> tab |> kEND |> newline
+            |> kEND
+        |> finish_tokens
+     
+     {status, tree} = parse(tokens)
+     assert status == :ok
+     assert tree == program [ loop [print(integer("827")), break] ]
   end
 end

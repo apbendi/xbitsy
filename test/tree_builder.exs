@@ -7,6 +7,7 @@ defmodule TreeBuilder do
     def ifn(test_node, statements, else_statements \\ []), do: if(:ifn, test_node, statements, else_statements)
     def loop(statements), do: %{kind: :loop, statements: statements}
     def empty_loop(), do: loop([])
+    def break(), do: %{kind: :break}
 
     def print(value_node), do: %{kind: :print, value: value_node}
 

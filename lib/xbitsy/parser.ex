@@ -53,8 +53,9 @@ defmodule Xbitsy.Parser do
             :ifp      -> if_statement(tokens)
             :ifn      -> if_statement(tokens)
             :loop     -> loop(tokens)
-            :variable -> assignment(tokens)
+            :break    -> break(tokens)
             :print    -> print(tokens)
+            :variable -> assignment(tokens)
             _ -> raise "[ERROR] Unexpected token in block #{token_value}"
         end
 
@@ -86,6 +87,11 @@ defmodule Xbitsy.Parser do
         tokens = tokens |> match(:end)
         
         {tokens, %{kind: :loop, statements: statements}}
+    end
+
+    defp break(tokens) do
+        tokens = tokens |> match(:break)
+        {tokens, %{kind: :break}}
     end
 
     defp print(tokens) do
