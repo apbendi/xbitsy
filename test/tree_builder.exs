@@ -1,6 +1,8 @@
 defmodule TreeBuilder do
     def program(statements), do: %{kind: :program, statements: statements}
 
+    def if(kind, statements, else_statements), do: %{kind: kind, statements: statements, else_statements: else_statements}
+    def ifz(statements, else_statements \\ []), do: if(:ifz, statements, else_statements)
     def loop(statements), do: %{kind: :loop, statements: statements}
     def empty_loop(), do: loop([])
 

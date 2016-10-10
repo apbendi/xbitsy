@@ -48,6 +48,7 @@ defmodule Xbitsy.Parser do
     defp block(tokens = [{:end, _token_value} | _tail_tokens], statements), do: {tokens, Enum.reverse(statements)}
     defp block(tokens = [{token_type, token_value} | _tail_tokens], statements) do
          {tokens, node} = case token_type do
+            :ifz      -> if_statement(tokens)
             :loop     -> loop(tokens)
             :variable -> assignment(tokens)
             :print    -> print(tokens)
@@ -55,6 +56,14 @@ defmodule Xbitsy.Parser do
         end
 
         block(tokens, [node | statements])
+    end
+
+    defp if_statement(tokens) do
+        tokens = tokens |> match(:ifz)
+        {tokens, exp_node} = tokens |> expression
+        {tokens, conditional_statements} = tokens |> block
+
+        {tokens, %{kind: :ifz, test: exp_node, statements: conditional_statements, else_statements: []}}
     end
 
     defp loop(tokens) do
