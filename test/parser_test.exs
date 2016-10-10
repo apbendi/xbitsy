@@ -221,4 +221,16 @@ defmodule ParserTest do
       assert status == :ok
       assert tree == program [print multiplication(integer("2"), addition(integer("1"), integer("6")))]
   end
+
+  test "parse a bitsy program adding a variable to an integer" do
+      tokens = start_tokens
+            |> kBEGIN |> newline
+            |> tab |> kPRINT |> space |> integer("2") |> opAdd |> variable("x") |> newline
+            |> kEND
+        |> finish_tokens
+
+      {status, tree} = parse(tokens)
+      assert status == :ok
+      assert tree == program [print addition(integer("2"), variable("x"))]
+  end
 end

@@ -127,6 +127,10 @@ defmodule Xbitsy.Parser do
                 {tokens, integer} = tokens |> match_extract(:integer)
                 node = %{kind: :integer, value: integer}
                 {tokens, node}
+            :variable ->
+                {tokens, var_name} = tokens |> match_extract(:variable)
+                node = %{kind: :variable, name: var_name}
+                {tokens, node}
             :paren_open ->
                 {tokens, node} = tokens |> match(:paren_open) |> expression
                 tokens = tokens |> match(:paren_close)
