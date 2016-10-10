@@ -3,7 +3,7 @@ defmodule Xbitsy.Runner do
     def run({:ok, tree}), do: run(tree)
     def run({:error, message}), do: IO.puts message
 
-    def run(_tree = %{kind: :program, block: %{kind: :block, statements: statement_list}}) do
+    def run(_tree = %{kind: :program, statements: statement_list}) do
         printed_output = run_statements(statement_list)
         {:ok, printed_output}
     end

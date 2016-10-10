@@ -1,11 +1,8 @@
 defmodule TreeBuilder do
-    def program(block), do: %{kind: :program, block: block}
+    def program(statements), do: %{kind: :program, statements: statements}
 
-    def block(statements), do: %{kind: :block, statements: statements}
-    def empty_block(), do: block([])
-
-    def loop(block), do: %{kind: :loop, block: block}
-    def empty_loop(), do: loop(empty_block)
+    def loop(statements), do: %{kind: :loop, statements: statements}
+    def empty_loop(), do: loop([])
 
     def print(value_node), do: %{kind: :print, value: value_node}
 

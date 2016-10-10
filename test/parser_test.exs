@@ -56,7 +56,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program(empty_block)
+      assert tree == program []
   end
 
   test "parse the bitsy null program with comments" do
@@ -68,7 +68,7 @@ defmodule ParserTest do
      
     {status, tree} = parse(tokens)
     assert status == :ok
-    assert tree == program(empty_block)
+    assert tree == program []
   end
 
   test "parse a bitsy program with a loop" do
@@ -81,7 +81,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program(block([empty_loop]))
+      assert tree == program [empty_loop]
   end
 
   test "parse a bitsy program with a nested loop" do
@@ -96,7 +96,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [ loop block [empty_loop] ]
+      assert tree == program [ loop [empty_loop] ]
   end
 
   test "parse a bitsy program with an int literal assignment" do
@@ -108,7 +108,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [assignment("foo", integer "42")]
+      assert tree == program [assignment("foo", integer "42")]
   end
 
   test "parse a bitsy program with the addtion of three int literals" do
@@ -122,7 +122,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [assignment("bar", addition(addition(integer("116"), integer("827")), integer("42")))]
+      assert tree == program [assignment("bar", addition(addition(integer("116"), integer("827")), integer("42")))]
   end
 
   test "parse a bitsy program with the addtion and subtraction of three int literals" do
@@ -136,7 +136,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [assignment("bar", subtraction(addition(integer("116"), integer("827")), integer("42")))]
+      assert tree == program [assignment("bar", subtraction(addition(integer("116"), integer("827")), integer("42")))]
   end
 
   test "parse a bitsy program that prints an integer literal" do
@@ -148,7 +148,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [print integer("116")]
+      assert tree == program [print integer("116")]
   end
 
   test "parse a bitsy program that prints a subtraction of integer literals" do
@@ -160,7 +160,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [print subtraction(integer("827"), integer("116"))]
+      assert tree == program [print subtraction(integer("827"), integer("116"))]
   end
 
   test "parse a bitsy program that prints the multiplication of integer literals" do
@@ -172,7 +172,7 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [print multiplication(integer("2"), integer("7"))]
+      assert tree == program [print multiplication(integer("2"), integer("7"))]
   end
 
   test "parse a bitsy program that prints the division of integer literals" do
@@ -184,7 +184,7 @@ defmodule ParserTest do
       
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [print division(integer("116"), integer("2"))]
+      assert tree == program [print division(integer("116"), integer("2"))]
   end
 
   test "parse a bitsy program that prints the modulus of integer literals" do
@@ -196,7 +196,7 @@ defmodule ParserTest do
 
      {status, tree} = parse(tokens)
      assert status == :ok
-     assert tree == program block [print modulus(integer("27"), integer("6"))]
+     assert tree == program [print modulus(integer("27"), integer("6"))]
   end
 
   test "parse a bitsy program that prints a negative integer literal" do
@@ -206,7 +206,7 @@ defmodule ParserTest do
       
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [print subtraction(integer("0"), integer("54"))]
+      assert tree == program [print subtraction(integer("0"), integer("54"))]
   end
 
   test "parse a bitsy program with a parenthesized expression" do
@@ -219,6 +219,6 @@ defmodule ParserTest do
 
       {status, tree} = parse(tokens)
       assert status == :ok
-      assert tree == program block [print multiplication(integer("2"), addition(integer("1"), integer("6")))]
+      assert tree == program [print multiplication(integer("2"), addition(integer("1"), integer("6")))]
   end
 end
