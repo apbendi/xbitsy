@@ -1,39 +1,40 @@
 defmodule Xbitsy.Runner do
+
+    defstruct prints: [] # program state
     
     def run({:ok, tree}), do: run(tree)
     def run({:error, message}), do: IO.puts message
 
     def run(_tree = %{kind: :program, statements: statement_list}) do
-        printed_output = run_statements(statement_list)
-        {:ok, printed_output}
+        final_state = run_statements(statement_list)
+        {:ok, final_state.prints}
     end
 
     # RUN STATEMENT LIST
 
-    defp run_statements(statement_list, printed_acc \\ [])
+    defp run_statements(statement_list, state \\ %Xbitsy.Runner{})
 
-    defp run_statements([], printed_acc), do: printed_acc
+    defp run_statements([], state), do: state
 
-    defp run_statements([first_statement | tail_statements], printed_acc) do
+    defp run_statements([first_statement | tail_statements], state) do
         {:ok, statement_kind} = Map.fetch(first_statement, :kind)
 
-        statement_prints = 
+        state = 
         case statement_kind do
-            :print -> do_print(first_statement)
+            :print -> do_print(first_statement, state)
             _ -> raise "Unexpected Kind of Statement: #{statement_kind}"
         end
 
-        printed_acc = printed_acc |> append_prints(statement_prints)
-
-        run_statements(tail_statements, printed_acc)
+        run_statements(tail_statements, state)
     end
 
     # DO STATEMENTS
 
-    defp do_print(%{kind: :print, value: node}) do
+    defp do_print(%{kind: :print, value: node}, state) do
         node_value = evaluate(node)
         IO.puts node_value
-        ["#{node_value}"]
+
+       state |> append_prints(["#{node_value}"])
     end
 
     # EVALUATE EXPRESSIONS
@@ -53,5 +54,7 @@ defmodule Xbitsy.Runner do
 
     # HELPERS
 
-    defp append_prints(acc, new_prints), do: List.flatten [acc | new_prints]
+    defp append_prints(state, new_prints) do
+        put_in(state.prints, List.flatten [state.prints | new_prints])
+    end
 end
