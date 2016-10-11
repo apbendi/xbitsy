@@ -1,7 +1,7 @@
 defmodule Xbitsy.Runner do
 
     # program state
-    defstruct prints: [], var_vals: %{}
+    defstruct prints: [], var_vals: %{}, break_loop: false
     
     def run({:ok, tree}), do: run(tree)
     def run({:error, message}), do: IO.puts message
@@ -14,24 +14,29 @@ defmodule Xbitsy.Runner do
     end
 
     # RUN STATEMENT LIST
+
     defp run_statements(state, []), do: state
 
     defp run_statements(state, [first_statement | tail_statements]) do
-        {:ok, statement_kind} = Map.fetch(first_statement, :kind)
+        state
+            |> run_one_statement(first_statement)
+            |> run_statements(tail_statements)
+    end
 
+    defp run_one_statement(state, statement = %{kind: statement_kind}) do
         statement_processor = 
         case statement_kind do
             :ifz        -> &do_if/2
             :ifp        -> &do_if/2
             :ifn        -> &do_if/2
+            :loop       -> &do_loop/2
+            :break      -> &do_break/2
             :print      -> &do_print/2
             :assignment -> &do_assignment/2
             _ -> raise "Unexpected Kind of Statement: #{statement_kind}"
         end
 
-        state 
-            |> statement_processor.(first_statement) 
-            |> run_statements(tail_statements)
+        state |> statement_processor.(statement)
     end
 
     # DO STATEMENTS
@@ -47,6 +52,31 @@ defmodule Xbitsy.Runner do
         end
 
         state |> run_statements(branch_statements)
+    end
+
+    defp do_loop(state, loop_node = %{kind: :loop, statements: statements}) do
+        state = state |> run_loop_statements(statements)
+
+        if state.break_loop do
+            state |> set_break(false)
+        else
+            state |> do_loop(loop_node)
+        end
+    end
+
+    defp run_loop_statements(state, []), do: state
+    defp run_loop_statements(state, [first_statement | tail_statements]) do
+        state = state |> run_one_statement(first_statement)
+
+        if state.break_loop do
+            state
+        else
+            state |> run_loop_statements(tail_statements)
+        end
+    end
+
+    defp do_break(state, %{kind: :break}) do
+        state |> set_break(true)
     end
 
     defp do_print(state, %{kind: :print, value: node}) do
@@ -88,6 +118,10 @@ defmodule Xbitsy.Runner do
     # HELPERS
 
     defp empty_state(), do: %Xbitsy.Runner{}
+
+    defp set_break(state, value) when is_boolean(value) do
+        put_in(state.break_loop, value)
+    end
 
     defp append_prints(state, new_prints) do
         put_in(state.prints, List.flatten [state.prints | new_prints])

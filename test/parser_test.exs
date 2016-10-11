@@ -328,4 +328,23 @@ defmodule ParserTest do
      assert status == :ok
      assert tree == program [ loop [print(integer("827")), break] ]
   end
+
+  test "parse a bitsy program with multiple LOOP and immediate BREAK statements" do
+      tokens = start_tokens
+            |> kBEGIN |> newline
+            |> tab |> kLOOP |> newline
+            |> tab |> tab |> kPRINT |> space |> integer("827") |> newline
+            |> tab |> tab |> kBREAK |> newline
+            |> tab |> kEND |> newline
+            |> tab |> kLOOP |> newline
+            |> tab |> tab |> kPRINT |> space |> integer("116") |> newline
+            |> tab |> tab |> kBREAK |> newline
+            |> tab |> kEND |> newline
+            |> kEND
+        |> finish_tokens
+     
+     {status, tree} = parse(tokens)
+     assert status == :ok
+     assert tree == program [ loop([print(integer("827")), break]), loop([print(integer("116")), break]) ]
+  end
 end

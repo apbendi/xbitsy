@@ -150,4 +150,62 @@ defmodule RunnerTest do
         assert status == :ok
         assert final_state.prints == ["27"]
     end
+
+    test "it should run a program with a LOOP and immediate BREAK statement" do
+        tree = program [ loop [print(integer("827")), break] ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints == ["827"]
+    end
+
+    test "it should run a program with multiple LOOP/immediate BREAK statements" do
+        tree = program [ loop([print(integer("827")), break]), loop([print(integer("116")), break]) ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints == ["827", "116"]
+    end
+
+    test "it should run a program with a LOOP and an unreachable PRINT statement" do
+        tree = program [ print(integer("116")), loop [break, print(integer("827"))] ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints == ["116"]
+    end
+
+    test "it should run a program with a LOOP and counter" do
+        tree = program [ assignment("x", integer "3"),
+                         loop([
+                             print(variable "x"),
+                             assignment("x", subtraction(variable("x"), integer("1"))),
+                             ifz(variable("x"), [break])
+                         ])
+                       ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints == ["3", "2", "1"]
+    end
+
+    test "it should run a program with nest LOOPs and counters" do
+        tree = program [ assignment("x", integer "3"),
+                         loop([
+                             print(variable "x"),
+                             assignment("x", subtraction(variable("x"), integer("1"))),
+                             ifz(variable("x"), [break]),
+                             assignment("y", integer "2"),
+                             loop([
+                                 print(multiplication(variable("y"), integer("10"))),
+                                 assignment("y", subtraction(variable("y"), integer("1"))),
+                                 ifz(variable("y"), [break]),
+                             ])                            
+                         ])
+                       ]
+        {status, final_state} = run(tree)
+
+        assert status == :ok
+        assert final_state.prints == ["3", "20", "10", "2", "20", "10", "1"]
+    end
 end
