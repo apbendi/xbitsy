@@ -97,6 +97,7 @@ defmodule TokenizerTest do
               {:else, "ELSE"}, {:whitespace, "\n"},
               {:end, "END"}, {:whitespace, "\n"},
               {:loop, "LOOP"}, {:whitespace, "\n"},
+              {:break, "BREAK"}, {:whitespace, "\n"},
               {:end, "END"}, {:whitespace, "\n"},
               {:ifp, "IFP"}, {:whitespace, "\n"},
               {:end, "END"}, {:whitespace, "\n"},
@@ -106,7 +107,7 @@ defmodule TokenizerTest do
               {:read, "READ"}, {:whitespace, "\n"},
               {:end, "END"}, {:whitespace, "\n"},
              ]
-    assert tokenize("BEGIN\nIFZ\n\ELSE\nEND\nLOOP\nEND\nIFP\nEND\nIFN\nEND\nPRINT\nREAD\nEND\n") == tokens
+    assert tokenize("BEGIN\nIFZ\n\ELSE\nEND\nLOOP\nBREAK\nEND\nIFP\nEND\nIFN\nEND\nPRINT\nREAD\nEND\n") == tokens
   end
 
   test "tokenize an assignment operator" do

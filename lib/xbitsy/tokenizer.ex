@@ -14,6 +14,7 @@ defmodule Xbitsy.Tokenizer do
   defp to_token("IFN"),    do: {:ifn, "IFN"}
   defp to_token("ELSE"),   do: {:else, "ELSE"}
   defp to_token("LOOP"),   do: {:loop, "LOOP"}
+  defp to_token("BREAK"),  do: {:break, "BREAK"}
   defp to_token("PRINT"),  do: {:print, "PRINT"}
   defp to_token("READ"),   do: {:read, "READ"}
 
