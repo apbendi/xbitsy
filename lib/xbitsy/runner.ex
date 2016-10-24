@@ -32,6 +32,7 @@ defmodule Xbitsy.Runner do
             :loop       -> &do_loop/2
             :break      -> &do_break/2
             :print      -> &do_print/2
+            :read       -> &do_read/2
             :assignment -> &do_assignment/2
             _ -> raise "Unexpected Kind of Statement: #{statement_kind}"
         end
@@ -86,6 +87,11 @@ defmodule Xbitsy.Runner do
        state |> append_prints(["#{node_value}"])
     end
 
+    defp do_read(state, %{kind: :read, variable: %{kind: :variable, name: var_name}}) do
+        input = read_int()
+        state |> assign_var(var_name, input)
+    end
+
     defp do_assignment(state, %{kind: :assignment, variable: %{kind: :variable, name: var_name}, value: val_node}) do
        node_value = evaluate(state, val_node)
        state |> assign_var(var_name, node_value)  
@@ -129,6 +135,12 @@ defmodule Xbitsy.Runner do
 
     defp assign_var(state, var_name, var_value) do
         put_in(state.var_vals, Map.put(state.var_vals, var_name, var_value))
+    end
+
+    defp read_int() do
+        IO.read(:stdio, :line)
+            |> String.trim
+            |> String.to_integer
     end
 
     defp test_for_if(type) do

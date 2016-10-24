@@ -10,6 +10,7 @@ defmodule TreeBuilder do
     def break(), do: %{kind: :break}
 
     def print(value_node), do: %{kind: :print, value: value_node}
+    def read(var_name), do: %{kind: :read, variable: variable(var_name)}
 
     def variable(name), do: %{kind: :variable, name: name}
     def integer(value), do: %{kind: :integer, value: value}

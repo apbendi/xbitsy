@@ -38,6 +38,10 @@ defmodule TokenizerTest do
     assert lex("BEGIN var_name END") == ["BEGIN", " ", "var_name", " ", "END"]
   end
 
+  test "lex the READ keyword with a variable" do
+    assert lex("BEGIN READ var_name END") == ["BEGIN", " ", "READ", " ", "var_name", " ", "END"]
+  end
+
   test "lex a number" do
     assert lex("116") == ["116"]
   end
@@ -75,7 +79,7 @@ defmodule TokenizerTest do
   end
 
   test "lex parens in a mathematical statement" do
-    assert lex("x=2*((1 + 1) - 42)") == ["x", "=", "2", "*", "(", "(", "1", " ", "+", " ", "1", ")", " ", "-", " ", "42", ")"] 
+    assert lex("x=2*((1 + 1) - 42)") == ["x", "=", "2", "*", "(", "(", "1", " ", "+", " ", "1", ")", " ", "-", " ", "42", ")"]
   end
 
   test "lex a comment" do
@@ -163,7 +167,7 @@ defmodule TokenizerTest do
     tokens = [
       {:begin, "BEGIN"}, {:whitespace, "\n\t"},
       {:variable, "x"}, {:assignment, "="},
-      {:integer, "116"}, {:whitespace, "\n"}, 
+      {:integer, "116"}, {:whitespace, "\n"},
       {:end, "END"}
     ]
     assert tokenize("BEGIN\n\tx=116\nEND") == tokens

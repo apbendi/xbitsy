@@ -55,6 +55,7 @@ defmodule Xbitsy.Parser do
             :loop     -> loop(tokens)
             :break    -> break(tokens)
             :print    -> print(tokens)
+            :read     -> read(tokens)
             :variable -> assignment(tokens)
             _ -> raise "[ERROR] Unexpected token in block #{token_value}"
         end
@@ -99,6 +100,14 @@ defmodule Xbitsy.Parser do
         {tokens, exp_node} = tokens |> expression
 
         {tokens, %{kind: :print, value: exp_node}}
+    end
+
+    defp read(tokens) do
+        tokens = tokens |> match(:read)
+        {tokens, var_name} = tokens |> match_extract(:variable)
+
+        node = %{kind: :read, variable: %{kind: :variable, name: var_name}}
+        {tokens, node}
     end
 
     defp assignment(tokens) do

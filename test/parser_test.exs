@@ -10,13 +10,14 @@ defmodule ParserTest do
   # CONVENIENCE TOKEN BUILDERS
   defp start_tokens(), do: []
   defp finish_tokens(tokens), do: Enum.reverse(tokens)
-  
+
   defp keyword(tokens, symbol), do: [{symbol, String.upcase to_string(symbol) } | tokens]
   defp kBEGIN(tokens), do: tokens |> keyword(:begin)
   defp kEND(tokens), do: tokens |> keyword(:end)
   defp kLOOP(tokens), do: tokens |> keyword(:loop)
   defp kBREAK(tokens), do: tokens |> keyword(:break)
   defp kPRINT(tokens), do: tokens |> keyword(:print)
+  defp kREAD(tokens), do: tokens |> keyword(:read)
   defp kIFZ(tokens), do: tokens |> keyword(:ifz)
   defp kIFP(tokens), do: tokens |> keyword(:ifp)
   defp kIFN(tokens), do: tokens |> keyword(:ifn)
@@ -53,10 +54,10 @@ defmodule ParserTest do
   end
 
   test "parse the bitsy null program" do
-      tokens = start_tokens 
-                    |> kBEGIN 
-                    |> newline 
-                    |> kEND 
+      tokens = start_tokens
+                    |> kBEGIN
+                    |> newline
+                    |> kEND
                |> finish_tokens
 
       {status, tree} = parse(tokens)
@@ -70,7 +71,7 @@ defmodule ParserTest do
                     |> kBEGIN |> newline |> comment("A comment\nIn the middle") |> newline
                     |> kEND |> space |> comment("A comment at the end!")
                 |> finish_tokens
-     
+
     {status, tree} = parse(tokens)
     assert status == :ok
     assert tree == program []
@@ -119,11 +120,11 @@ defmodule ParserTest do
   test "parse a bitsy program with the addtion of three int literals" do
       tokens = start_tokens
                     |> kBEGIN |> newline
-                    |> tab |> variable("bar") |> opAssignment 
+                    |> tab |> variable("bar") |> opAssignment
                     |> integer("116") |> opAdd |> integer("827") |> opAdd |> integer("42") |> newline # 116 + 827 + 42
                     |> kEND
               |> finish_tokens
-      
+
 
       {status, tree} = parse(tokens)
       assert status == :ok
@@ -133,11 +134,11 @@ defmodule ParserTest do
   test "parse a bitsy program with the addtion and subtraction of three int literals" do
       tokens = start_tokens
                     |> kBEGIN |> newline
-                    |> tab |> variable("bar") |> opAssignment 
+                    |> tab |> variable("bar") |> opAssignment
                     |> integer("116") |> opAdd |> integer("827") |> opSubtract |> integer("42") |> newline
                     |> kEND
               |> finish_tokens
-      
+
 
       {status, tree} = parse(tokens)
       assert status == :ok
@@ -154,6 +155,18 @@ defmodule ParserTest do
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program [print integer("116")]
+  end
+
+  test "parse a bitsy program that reads an integer" do
+    tokens = start_tokens
+              |> kBEGIN |> newline
+              |> tab |> kREAD |> space |> variable("foo_bar") |> newline
+              |> kEND
+          |> finish_tokens
+
+    {status, tree} = parse(tokens)
+    assert status == :ok
+    assert tree == program [read("foo_bar")]
   end
 
   test "parse a bitsy program that prints a subtraction of integer literals" do
@@ -186,7 +199,7 @@ defmodule ParserTest do
                 |> kPRINT |> tab |> integer("116") |> opDivide |> integer("2") |> newline
                 |> kEND
             |> finish_tokens
-      
+
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program [print division(integer("116"), integer("2"))]
@@ -208,7 +221,7 @@ defmodule ParserTest do
       tokens = start_tokens
             |> kBEGIN |> space |> kPRINT |> space |> opSubtract |> integer("54") |> space |> kEND
             |> finish_tokens
-      
+
       {status, tree} = parse(tokens)
       assert status == :ok
       assert tree == program [print subtraction(integer("0"), integer("54"))]
@@ -217,7 +230,7 @@ defmodule ParserTest do
   test "parse a bitsy program with a parenthesized expression" do
       tokens = start_tokens
             |> kBEGIN |> newline
-            |> tab |> kPRINT |> space |> integer("2") |> opMultiply 
+            |> tab |> kPRINT |> space |> integer("2") |> opMultiply
             |> paren_open |> integer("1") |> opAdd |> integer("6") |> paren_close |> newline
             |> kEND
         |> finish_tokens
@@ -323,7 +336,7 @@ defmodule ParserTest do
             |> tab |> kEND |> newline
             |> kEND
         |> finish_tokens
-     
+
      {status, tree} = parse(tokens)
      assert status == :ok
      assert tree == program [ loop [print(integer("827")), break] ]
@@ -342,7 +355,7 @@ defmodule ParserTest do
             |> tab |> kEND |> newline
             |> kEND
         |> finish_tokens
-     
+
      {status, tree} = parse(tokens)
      assert status == :ok
      assert tree == program [ loop([print(integer("827")), break]), loop([print(integer("116")), break]) ]
