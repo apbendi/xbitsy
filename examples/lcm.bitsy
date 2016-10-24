@@ -1,0 +1,28 @@
+{ Naively calculate the lowest common multiple between two integers }
+
+BEGIN
+  first_num = 4
+  second_num = 6
+
+  IFP first_num - second_num
+    greater = first_num
+    lesser = second_num
+  ELSE
+    greater = second_num
+    lesser = first_num
+  END
+
+  mult_count = 1
+
+  LOOP
+    multiple = greater * mult_count
+
+    IFZ multiple % lesser
+      BREAK
+    END
+
+    mult_count = mult_count + 1
+  END
+
+  PRINT multiple
+END
