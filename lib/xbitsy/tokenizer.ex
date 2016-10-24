@@ -86,7 +86,7 @@ defmodule Xbitsy.Tokenizer do
 
   # MATCHERS
   defp is_white?(char),    do: char == ?\s or char == ?\t or char == ?\n
-  defp is_ident?(char),    do: (char >= ?A and char <= ?Z) or (char >= ?a and char <= ?z)
+  defp is_ident?(char),    do: (char >= ?A and char <= ?Z) or (char >= ?a and char <= ?z) or (char == ?_)
   defp is_num?(char),      do: char >= ?0 and char <= ?9
   defp is_operator?(char), do: char == ?= or char == ?* or char == ?/ or char == ?% or char == ?+ or char == ?-
 end

@@ -34,6 +34,10 @@ defmodule TokenizerTest do
     assert lex("BEGIN var END") == ["BEGIN", " ", "var", " ", "END"]
   end
 
+  test "lex a variable name with an underscore" do
+    assert lex("BEGIN var_name END") == ["BEGIN", " ", "var_name", " ", "END"]
+  end
+
   test "lex a number" do
     assert lex("116") == ["116"]
   end
